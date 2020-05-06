@@ -24,17 +24,17 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="m_lblImg">
+     <item row="2" column="0">
+      <widget class="QPushButton" name="m_pbSkip">
        <property name="text">
-        <string>TextLabel</string>
+        <string>Skip</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QPushButton" name="m_pbSkip">
+      <widget class="QLabel" name="m_lblImg">
        <property name="text">
-        <string>Skip</string>
+        <string>TextLabel</string>
        </property>
       </widget>
      </item>
@@ -82,5 +82,42 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>m_pbSkip</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>SkipCurrentImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>307</x>
+     <y>562</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>318</x>
+     <y>686</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_pbSave</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>Save()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>720</x>
+     <y>564</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>707</x>
+     <y>637</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>SkipCurrentImage()</slot>
+  <slot>Save()</slot>
+ </slots>
 </ui>
