@@ -27,6 +27,21 @@ set(UI
         "src/DatasetBuilder/MainWindow.ui")
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${UI})
+target_compile_options(${PROJECT_NAME} INTERFACE)
+if (CMAKE_COMPILER_IS_GNUCC)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wwrite-strings -std=c++17 -Wno-psabi -Wno-unused-parameter -Wno-ignored-qualifiers -Wno-deprecated -lstdc++fs)
+elseif (MSVC)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_options(${PROJECT_NAME} PRIVATE /std:c++17 /Zc:__cplusplus /MDd /Od /EHsc /wd4996 /Zi /wd4634 /wd4635)
+    else()
+        target_compile_options(${PROJECT_NAME} PRIVATE /std:c++17 /Zc:__cplusplus /DNDEBUG /O2 /Ob2 /EHsc /MT /Zi /wd4996 /wd4634 /wd4635)
+    endif()
+
+    if(MARIONETTE_DYNAMIC)
+            target_compile_definitions(${PROJECT_NAME} PRIVATE MARIONETTE_DYNAMIC)
+    endif()
+endif ()
+
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(${PROJECT_NAME}

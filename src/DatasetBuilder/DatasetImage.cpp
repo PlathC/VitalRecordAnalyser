@@ -9,6 +9,7 @@ namespace DatasetBuilder {
         m_src(cv::imread(path)),
         m_srcPath(path)
     {}
+
     void DatasetImage::Save(const std::string& outputFolder) const
     {
         std::string fileName = outputFolder + m_srcPath.stem().string();

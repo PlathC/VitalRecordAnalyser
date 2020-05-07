@@ -14,11 +14,12 @@
 
 namespace fs = std::filesystem;
 
-namespace DatasetBuilder{
-
-    class DatasetImage {
+namespace DatasetBuilder
+{
+    class DatasetImage
+    {
     public:
-        DatasetImage(const std::string& path);
+        explicit DatasetImage(const std::string& path);
         void Save(const std::string& outputFolder) const;
 
         void Text(const std::string& nText);

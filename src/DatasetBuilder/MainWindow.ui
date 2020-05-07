@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>878</width>
+    <width>1071</width>
     <height>600</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>190</x>
       <y>0</y>
       <width>621</width>
       <height>551</height>
@@ -34,7 +34,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="m_lblImg">
        <property name="text">
-        <string>TextLabel</string>
+        <string>No image yet</string>
        </property>
       </widget>
      </item>
@@ -43,7 +43,7 @@
    <widget class="QWidget" name="gridLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>810</x>
       <y>0</y>
       <width>251</width>
       <height>551</height>
@@ -62,13 +62,28 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>191</width>
+      <height>551</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QListWidget" name="listWidget"/>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>878</width>
+     <width>1071</width>
      <height>21</height>
     </rect>
    </property>
@@ -76,10 +91,16 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="m_acInputFolders"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="m_acInputFolders">
+   <property name="text">
+    <string>Select input folders</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
