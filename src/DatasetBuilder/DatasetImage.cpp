@@ -10,6 +10,11 @@ namespace DatasetBuilder {
         m_srcPath(path)
     {}
 
+    DatasetImage::DatasetImage(const cv::Mat& src, const std::string& path) :
+            m_src(src),
+            m_srcPath(path)
+    {}
+
     void DatasetImage::Save(const std::string& outputFolder) const
     {
         std::string fileName = outputFolder + "/" + m_srcPath.filename().string();

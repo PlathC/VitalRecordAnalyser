@@ -8,6 +8,8 @@
 #include <stack>
 #include <string>
 
+#include "TextSegmentation/TextSegmentation.hpp"
+
 #include "DatasetBuilder/DatasetImage.hpp"
 
 namespace DatasetBuilder

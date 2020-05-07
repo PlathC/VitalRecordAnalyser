@@ -20,7 +20,7 @@ namespace DatasetBuilder
     {
     public:
         explicit DatasetImage(const std::string& path);
-        explicit DatasetImage(const cv::Mat& src);
+        explicit DatasetImage(const cv::Mat& src, const std::string& path);
 
         void Save(const std::string& outputFolder) const;
 

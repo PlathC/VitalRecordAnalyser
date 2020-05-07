@@ -8,12 +8,12 @@
 Binarization::Binarization() {};
 
 void Binarization::binarize(cv::Mat image, cv::Mat &output, bool light, int option){
-	cv::Mat grayscale;
-	cvtColor(image, grayscale, cv::COLOR_BGR2GRAY);
+    cv::Mat grayscale;
+    cvtColor(image, grayscale, cv::COLOR_BGR2GRAY);
 
-	if (light){
-	    lightDistribution(grayscale);
-	} 
+    if (light){
+        lightDistribution(grayscale);
+    }
 
     int winy = (int) (2.0 * grayscale.rows-1)/3;
     int winx = (int) grayscale.cols-1 < winy ? grayscale.cols-1 : winy;
@@ -24,191 +24,191 @@ void Binarization::binarize(cv::Mat image, cv::Mat &output, bool light, int opti
 
 void Binarization::thresholdImg(cv::Mat im, cv::Mat &output, int option, int winx, int winy, double k, double dR){
 
-	if (option > 1){
-		double m, s, maxS;
-		double th = 0;
-		double minI, maxI;
-		int wxh	= winx/2;
-		int wyh	= winy/2;
-		int xFirstth= wxh;
-		int xLastth = im.cols-wxh-1;
-		int yLastth = im.rows-wyh-1;
-		int yFirstth = wyh;
+    if (option > 1){
+        double m, s, maxS;
+        double th = 0;
+        double minI, maxI;
+        int wxh	= winx/2;
+        int wyh	= winy/2;
+        int xFirstth= wxh;
+        int xLastth = im.cols-wxh-1;
+        int yLastth = im.rows-wyh-1;
+        int yFirstth = wyh;
 
-		output = im.clone();
-		cv::Mat mapM = cv::Mat::zeros(im.rows, im.cols, CV_32F);
-		cv::Mat mapS = cv::Mat::zeros(im.rows, im.cols, CV_32F);
-		maxS = calcLocalStats(im, mapM, mapS, winx, winy);
+        output = im.clone();
+        cv::Mat mapM = cv::Mat::zeros(im.rows, im.cols, CV_32F);
+        cv::Mat mapS = cv::Mat::zeros(im.rows, im.cols, CV_32F);
+        maxS = calcLocalStats(im, mapM, mapS, winx, winy);
 
-		minMaxLoc(im, &minI, &maxI);
-		cv::Mat thsurf(im.rows, im.cols, CV_32F);
+        minMaxLoc(im, &minI, &maxI);
+        cv::Mat thsurf(im.rows, im.cols, CV_32F);
 
-		for	(int j=yFirstth; j<=yLastth; j++){
-			float *thSurfData = thsurf.ptr<float>(j) + wxh;
-			float *mapMData = mapM.ptr<float>(j) + wxh;
-			float *mapSData = mapS.ptr<float>(j) + wxh;
+        for	(int j=yFirstth; j<=yLastth; j++){
+            float *thSurfData = thsurf.ptr<float>(j) + wxh;
+            float *mapMData = mapM.ptr<float>(j) + wxh;
+            float *mapSData = mapS.ptr<float>(j) + wxh;
 
-			for	(int i=0; i<=im.cols-winx; i++) {
-				m = *mapMData++;
-				s = *mapSData++;
+            for	(int i=0; i<=im.cols-winx; i++) {
+                m = *mapMData++;
+                s = *mapSData++;
 
-				switch (option) {
-					case 2: // NIBLACK
-						th = m + k*s;
-						break;
+                switch (option) {
+                    case 2: // NIBLACK
+                        th = m + k*s;
+                        break;
 
-					case 3: // SAUVOLA
-						th = m * (1 + k*(s/dR-1));
-						break;
+                    case 3: // SAUVOLA
+                        th = m * (1 + k*(s/dR-1));
+                        break;
 
-					case 4: // WOLF
-						th = m + k * (s/maxS-1) * (m-minI);
-						break;
-				}
-				*thSurfData++ = th;
+                    case 4: // WOLF
+                        th = m + k * (s/maxS-1) * (m-minI);
+                        break;
+                }
+                *thSurfData++ = th;
 
-				if (i==0){
-					float *thSurfPtr = thsurf.ptr<float>(j);
-					for (int i=0; i<=xFirstth; ++i)
-						*thSurfPtr++ = th;
+                if (i==0){
+                    float *thSurfPtr = thsurf.ptr<float>(j);
+                    for (int i=0; i<=xFirstth; ++i)
+                        *thSurfPtr++ = th;
 
-					if (j==yFirstth){
-						for (int u=0; u<yFirstth; ++u){
-							float *thSurfPtr = thsurf.ptr<float>(u);
-							for (int i=0; i<=xFirstth; ++i)
-								*thSurfPtr++ = th;
-						}
-					}
+                    if (j==yFirstth){
+                        for (int u=0; u<yFirstth; ++u){
+                            float *thSurfPtr = thsurf.ptr<float>(u);
+                            for (int i=0; i<=xFirstth; ++i)
+                                *thSurfPtr++ = th;
+                        }
+                    }
 
-					if (j == yLastth){
-						for (int u=yLastth+1; u<im.rows; ++u){
-							float *thSurfPtr = thsurf.ptr<float>(u);
+                    if (j == yLastth){
+                        for (int u=yLastth+1; u<im.rows; ++u){
+                            float *thSurfPtr = thsurf.ptr<float>(u);
 
-							for (int i=0; i<=xFirstth; ++i)
-								*thSurfPtr++ = th;
-						}
-					}
-				}
+                            for (int i=0; i<=xFirstth; ++i)
+                                *thSurfPtr++ = th;
+                        }
+                    }
+                }
 
-				if (j==yFirstth)
-					for (int u=0; u<yFirstth; ++u)
-						thsurf.fset(i+wxh,u,th);
+                if (j==yFirstth)
+                    for (int u=0; u<yFirstth; ++u)
+                        thsurf.fset(i+wxh,u,th);
 
-				if (j==yLastth)
-					for (int u=yLastth+1; u<im.rows; ++u)
-						thsurf.fset(i+wxh,u,th);
-			}
-			float *thSurfPtr = thsurf.ptr<float>(j) + xLastth;
+                if (j==yLastth)
+                    for (int u=yLastth+1; u<im.rows; ++u)
+                        thsurf.fset(i+wxh,u,th);
+            }
+            float *thSurfPtr = thsurf.ptr<float>(j) + xLastth;
 
-			for (int i=xLastth; i<im.cols; ++i)
-				*thSurfPtr++ = th;
+            for (int i=xLastth; i<im.cols; ++i)
+                *thSurfPtr++ = th;
 
-			if (j==yFirstth){
-				for (int u=0; u<yFirstth; ++u){
-					float *thSurfPtr = thsurf.ptr<float>(u) + xLastth;
+            if (j==yFirstth){
+                for (int u=0; u<yFirstth; ++u){
+                    float *thSurfPtr = thsurf.ptr<float>(u) + xLastth;
 
-					for (int i=xLastth; i<im.cols; ++i)
-						*thSurfPtr++ = th;
-				}
-			}
+                    for (int i=xLastth; i<im.cols; ++i)
+                        *thSurfPtr++ = th;
+                }
+            }
 
-			if (j==yLastth){
-				for (int u=yLastth+1; u<im.rows; ++u){
-					float *thSurfPtr = thsurf.ptr<float>(u) + xLastth;
+            if (j==yLastth){
+                for (int u=yLastth+1; u<im.rows; ++u){
+                    float *thSurfPtr = thsurf.ptr<float>(u) + xLastth;
 
-					for (int i=xLastth; i<im.cols; ++i)
-						*thSurfPtr++ = th;
-				}
-			}
-		}
+                    for (int i=xLastth; i<im.cols; ++i)
+                        *thSurfPtr++ = th;
+                }
+            }
+        }
 
-		for	(int y=0; y<im.rows; ++y){
-			unsigned char *imData = im.ptr<unsigned char>(y);
-			float *thSurfData = thsurf.ptr<float>(y);
-			unsigned char *outputData = output.ptr<unsigned char>(y);
+        for	(int y=0; y<im.rows; ++y){
+            unsigned char *imData = im.ptr<unsigned char>(y);
+            float *thSurfData = thsurf.ptr<float>(y);
+            unsigned char *outputData = output.ptr<unsigned char>(y);
 
-			for	(int x=0; x<im.cols; ++x){
-				*outputData = *imData >= *thSurfData ? 255 : 0;
-				imData++;
-				thSurfData++;
-				outputData++;
-			}
-		}
+            for	(int x=0; x<im.cols; ++x){
+                *outputData = *imData >= *thSurfData ? 255 : 0;
+                imData++;
+                thSurfData++;
+                outputData++;
+            }
+        }
 
-	} else if (option == 1){
-		cv::Mat smoothedImg;
-		blur(im, smoothedImg, cv::Size(3,3), cv::Point(-1,-1));
-		threshold(smoothedImg, output, 0.0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    } else if (option == 1){
+        cv::Mat smoothedImg;
+        blur(im, smoothedImg, cv::Size(3,3), cv::Point(-1,-1));
+        threshold(smoothedImg, output, 0.0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-	} else {
-		threshold(im, output, 127, 255, cv::THRESH_BINARY);
-	}
+    } else {
+        threshold(im, output, 127, 255, cv::THRESH_BINARY);
+    }
 }
 
 double Binarization::calcLocalStats(cv::Mat &im, cv::Mat &mapM, cv::Mat &mapS, int winx, int winy){
-	cv::Mat imSum, imSumSq;
+    cv::Mat imSum, imSumSq;
     integral(im, imSum, imSumSq, CV_64F);
 
-	double m,s,maxS,sum,sumSq;
-	int wxh	= winx/2;
-	int wyh	= winy/2;
-	int xFirstth= wxh;
+    double m,s,maxS,sum,sumSq;
+    int wxh	= winx/2;
+    int wyh	= winy/2;
+    int xFirstth= wxh;
     int yFirstth= wyh;
-	int yLastth = im.rows-wyh-1;
-	double winarea = winx*winy;
+    int yLastth = im.rows-wyh-1;
+    double winarea = winx*winy;
 
-	maxS = 0;
-	for	(int j = yFirstth ; j<=yLastth; j++){
-		sum = sumSq = 0;
+    maxS = 0;
+    for	(int j = yFirstth ; j<=yLastth; j++){
+        sum = sumSq = 0;
 
-		double *sumTopLeft = imSum.ptr<double>(j - wyh);
-		double *sumTopRight = sumTopLeft + winx;
-		double *sumBottomLeft = imSum.ptr<double>(j - wyh + winy);
-		double *sumBottomRight = sumBottomLeft + winx;
+        double *sumTopLeft = imSum.ptr<double>(j - wyh);
+        double *sumTopRight = sumTopLeft + winx;
+        double *sumBottomLeft = imSum.ptr<double>(j - wyh + winy);
+        double *sumBottomRight = sumBottomLeft + winx;
 
-		double *sumEqTopLeft = imSumSq.ptr<double>(j - wyh);
-		double *sumEqTopRight = sumEqTopLeft + winx;
-		double *sumEqBottomLeft = imSumSq.ptr<double>(j - wyh + winy);
-		double *sumEqBottomRight = sumEqBottomLeft + winx;
+        double *sumEqTopLeft = imSumSq.ptr<double>(j - wyh);
+        double *sumEqTopRight = sumEqTopLeft + winx;
+        double *sumEqBottomLeft = imSumSq.ptr<double>(j - wyh + winy);
+        double *sumEqBottomRight = sumEqBottomLeft + winx;
 
-		sum = (*sumBottomRight + *sumTopLeft) - (*sumTopRight + *sumBottomLeft);
-		sumSq = (*sumEqBottomRight + *sumEqTopLeft) - (*sumEqTopRight + *sumEqBottomLeft);
+        sum = (*sumBottomRight + *sumTopLeft) - (*sumTopRight + *sumBottomLeft);
+        sumSq = (*sumEqBottomRight + *sumEqTopLeft) - (*sumEqTopRight + *sumEqBottomLeft);
 
-		m  = sum / winarea;
-		s  = sqrt ((sumSq - m*sum)/winarea);
-		if (s > maxS) maxS = s;
+        m  = sum / winarea;
+        s  = sqrt ((sumSq - m*sum)/winarea);
+        if (s > maxS) maxS = s;
 
-		float *mapMData = mapM.ptr<float>(j) + xFirstth;
-		float *mapSData = mapS.ptr<float>(j) + xFirstth;
-		*mapMData++ = m;
-		*mapSData++ = s;
+        float *mapMData = mapM.ptr<float>(j) + xFirstth;
+        float *mapSData = mapS.ptr<float>(j) + xFirstth;
+        *mapMData++ = m;
+        *mapSData++ = s;
 
-		for	(int i=1 ; i<=im.cols-winx; i++) {
-			sumTopLeft++, sumTopRight++, sumBottomLeft++, sumBottomRight++;
+        for	(int i=1 ; i<=im.cols-winx; i++) {
+            sumTopLeft++, sumTopRight++, sumBottomLeft++, sumBottomRight++;
 
-			sumEqTopLeft++, sumEqTopRight++, sumEqBottomLeft++, sumEqBottomRight++;
+            sumEqTopLeft++, sumEqTopRight++, sumEqBottomLeft++, sumEqBottomRight++;
 
-			sum = (*sumBottomRight + *sumTopLeft) - (*sumTopRight + *sumBottomLeft);
-			sumSq = (*sumEqBottomRight + *sumEqTopLeft) - (*sumEqTopRight + *sumEqBottomLeft);
+            sum = (*sumBottomRight + *sumTopLeft) - (*sumTopRight + *sumBottomLeft);
+            sumSq = (*sumEqBottomRight + *sumEqTopLeft) - (*sumEqTopRight + *sumEqBottomLeft);
 
-			m  = sum / winarea;
-			s  = sqrt ((sumSq - m*sum)/winarea);
-			if (s > maxS) maxS = s;
+            m  = sum / winarea;
+            s  = sqrt ((sumSq - m*sum)/winarea);
+            if (s > maxS) maxS = s;
 
-			*mapMData++ = m;
-			*mapSData++ = s;
-		}
-	}
-	return maxS;
+            *mapMData++ = m;
+            *mapSData++ = s;
+        }
+    }
+    return maxS;
 }
 
 void Binarization::lightDistribution(cv::Mat &grayscale){
-	getHistogram(grayscale);
-	getCEI(grayscale);
-	getEdge(grayscale);
-	getTLI(grayscale);
+    getHistogram(grayscale);
+    getCEI(grayscale);
+    getEdge(grayscale);
+    getTLI(grayscale);
 
-	cv::Mat intImg = this->cei.clone();
+    cv::Mat intImg = this->cei.clone();
 
     for (int y=0; y<intImg.cols; y++){
         for (int x=0; x<intImg.rows; x++){
@@ -233,8 +233,8 @@ void Binarization::lightDistribution(cv::Mat &grayscale){
                             mpvE.push_back(this->cei.at<float>(end+k,y));
                     }
 
-					cv::minMaxLoc(mpvH, &minH, &maxH);
-					cv::minMaxLoc(mpvE, &minE, &maxE);
+                    cv::minMaxLoc(mpvH, &minH, &maxH);
+                    cv::minMaxLoc(mpvE, &minE, &maxE);
 
                     for (int m=0; m<n; m++)
                         intImg.at<float>(head+m,y) = maxH + (m+1) * ((maxE-maxH) / n);
@@ -243,7 +243,7 @@ void Binarization::lightDistribution(cv::Mat &grayscale){
         }
     }
 
-	cv::Mat kernel = cv::Mat::ones(cv::Size(11, 11), CV_32F) * 1/121;
+    cv::Mat kernel = cv::Mat::ones(cv::Size(11, 11), CV_32F) * 1/121;
     filter2D(scale(intImg), this->ldi, CV_32F, kernel);
 
     grayscale = (this->cei/this->ldi) * 260;
@@ -261,7 +261,7 @@ void Binarization::lightDistribution(cv::Mat &grayscale){
 
 void Binarization::getHistogram(cv::Mat image){
     std::vector<cv::Mat> bgrPlanes;
-	cv::split(image, bgrPlanes);
+    cv::split(image, bgrPlanes);
 
     int histSize[] = {30};
     float bins[] = {0,300};
@@ -284,7 +284,7 @@ void Binarization::getHR(float sqrtHW){
 }
 
 void Binarization::getCEI(cv::Mat grayscale){
-	cv::Mat cei = (grayscale - (this->hr + 50 * 0.4)) * 2;
+    cv::Mat cei = (grayscale - (this->hr + 50 * 0.4)) * 2;
     normalize(cei, this->cei, 0, 255, cv::NORM_MINMAX, CV_32F);
     threshold(this->cei, this->ceiBin, 59, 255, cv::THRESH_BINARY_INV);
 }
@@ -300,7 +300,7 @@ void Binarization::getEdge(cv::Mat grayscale){
     cv::Mat kernel3(3, 3, CV_32F, m3);
     cv::Mat kernel4(3, 3, CV_32F, m4);
 
-	cv::Mat eg1, eg2, eg3, eg4;
+    cv::Mat eg1, eg2, eg3, eg4;
     filter2D(grayscale, eg1, CV_32F, kernel1);
     eg1 = abs(eg1);
 
@@ -323,7 +323,7 @@ void Binarization::getTLI(cv::Mat grayscale){
     this->tli -= this->ceiBin;
     threshold(this->tli, this->tli, 0, 255, cv::THRESH_BINARY);
 
-	cv::Mat kernel = cv::Mat::ones(cv::Size(3, 3), CV_32F);
+    cv::Mat kernel = cv::Mat::ones(cv::Size(3, 3), CV_32F);
     erode(this->tli, this->tliErosion, kernel);
     threshold(this->tliErosion, this->tliErosion, 0, 255, cv::THRESH_BINARY);
 }
@@ -332,7 +332,7 @@ cv::Mat Binarization::scale(cv::Mat image){
     double min, max;
     minMaxLoc(image, &min, &max);
 
-	cv::Mat res = image / (max - min);
+    cv::Mat res = image / (max - min);
     minMaxLoc(res, &min, &max);
     res -= min;
     res *= 255;

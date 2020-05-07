@@ -6,6 +6,7 @@
 #define CIVILREGISTRYANALYSER_TEXTSEGMENTATION_HPP
 
 #include <filesystem>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -24,9 +25,11 @@ class TextSegmentation
 public:
     TextSegmentation(const std::string& src, const std::string& out);
 
-    std::vector<cv::Mat> ExtractWords();
+    std::vector<cv::Mat> Process();
+    std::vector<cv::Mat> ExtractWords(const cv::Mat& src);
 
 private:
+    static constexpr uint16_t MinArea = 44000;
     cv::Mat m_src;
     std::string m_outputPath;
     std::string m_name;

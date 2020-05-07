@@ -13,22 +13,28 @@ namespace DatasetBuilder{
         m_folderPath(m_path),
         m_outputFolder(outputFolder)
     {
-        for(const auto& file : std::filesystem::recursive_directory_iterator(m_path))
+        std::string workingDir = m_outputFolder + "/temp";
+        fs::create_directory(workingDir);
+
+        fs::path file {m_path};
+        if(file.has_filename())
         {
-            if(file.is_regular_file())
+            bool isFileSupported = std::find(
+                    SupportedImageFiles.begin(),
+                    SupportedImageFiles.end(),
+                    file.extension().string())
+                            != SupportedImageFiles.end();
+            if(isFileSupported)
             {
-                auto& filePath = file.path();
-                bool isFileSupported = std::find(
-                        SupportedImageFiles.begin(),
-                        SupportedImageFiles.end(),
-                        filePath.extension().string())
-                                != SupportedImageFiles.end();
-                if(isFileSupported)
+                TextSegmentation segmentor = TextSegmentation(file.string(), workingDir);
+                std::vector<cv::Mat> imageList = segmentor.Process();
+                for(const auto& image : imageList)
                 {
-                    m_images.push(DatasetImage(filePath.string()));
+                    m_images.push(DatasetImage(image, outputFolder));
                 }
             }
         }
+
     }
 
     DatasetImage& ImageSet::CurrentImage()

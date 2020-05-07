@@ -78,22 +78,16 @@ namespace DatasetBuilder
         auto* dialog = new QFileDialog(this);
 
         // Change dialog behaviour to accept multi-folders selection
-        dialog->setFileMode(QFileDialog::DirectoryOnly);
-        dialog->setOption(QFileDialog::DontUseNativeDialog, true);
-
-        auto* fileView = dialog->findChild<QListView*>("listView");
-        if(fileView)
-            fileView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-
-        auto* fileTreeView = dialog->findChild<QTreeView*>();
-        if(fileTreeView)
-            fileTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-
+        dialog->setFileMode(QFileDialog::FileMode::ExistingFiles);
+        dialog->setWindowTitle("Select raw dataset images.");
         if(dialog->exec())
         {
             QStringList files = dialog->selectedFiles();
             for(const auto& file : files)
-                m_sets.emplace_back(file.toStdString());
+            {
+                m_sets.emplace_back(DatasetBuilder::ImageSet(file.toStdString(), m_outputFolder));
+                QMessageBox::information(this, "Success", "File " + file + " extracted !");
+            }
 
             if(!m_currentImg)
             {
