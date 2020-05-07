@@ -79,12 +79,15 @@ std::vector<cv::Mat> TextSegmentation::Process()
     int i = 0;
     for(const auto& img : detectedArea)
     {
-        cv::imwrite(m_outputPath + "/" + std::to_string(i) + ".png", img);
-        std::cout << "Writing into " + m_outputPath + "/" << std::endl;
-        std::cout << std::to_string(i++) << "/" << detectedArea.size() << std::endl;
+        if(img.cols*2 > img.rows)
+        {
+            cv::imwrite(m_outputPath + "/" + std::to_string(i) + ".png", img);
+            std::cout << "Writing into " + m_outputPath + "/" << std::endl;
+            std::cout << std::to_string(i++) << "/" << detectedArea.size() << std::endl;
 
-        std::vector<cv::Mat> extracted = ExtractWords(img);
-        detectedWords.insert(detectedWords.begin(), extracted.begin(), extracted.end());
+            std::vector<cv::Mat> extracted = ExtractWords(img);
+            detectedWords.insert(detectedWords.begin(), extracted.begin(), extracted.end());
+        }
     }
 
     return detectedWords;
@@ -118,7 +121,7 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
     std::unique_ptr<Binarization> threshold = std::make_unique<Binarization>();
     cv::Mat imageBinary;
     // default = 0 | otsu = 1 | niblack = 2 | sauvola = 3 | wolf = 4 //
-    threshold->binarize(imageCropped, imageBinary, true, 4);
+    threshold->binarize(imageCropped, imageBinary, false, 0);
 
     fs::path saveBinary = m_outputPath;
     std::string binaryName = m_name + "_2_binary" + m_extension;
@@ -158,10 +161,13 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
 
         fs::create_directories(m_wordsPath);
         for (int j=0; j<words.size(); j++) {
-            std::string wordIndex = lineIndex + "_" + std::to_string((j+1)*1e-6).substr(5);
-            fs::path saveWord = m_wordsPath / (wordIndex + m_extension);
-            cv::imwrite(saveWord.u8string(), words[j]);
-            wordsSave.push_back(words[j]);
+            if(words[j].cols > 100)
+            {
+                std::string wordIndex = lineIndex + "_" + std::to_string((j + 1) * 1e-6).substr(5);
+                fs::path saveWord = m_wordsPath / (wordIndex + m_extension);
+                cv::imwrite(saveWord.u8string(), words[j]);
+                wordsSave.push_back(words[j]);
+            }
         }
     }
 

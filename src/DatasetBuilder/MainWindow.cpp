@@ -139,13 +139,17 @@ namespace DatasetBuilder
 
     void MainWindow::keyPressEvent(QKeyEvent *event)
     {
-        if( event->key() == Qt::Key_Enter)
+        if( event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         {
             if(ui->m_leTextImg->hasFocus())
             {
                 Save();
                 ui->m_leTextImg->clear();
             }
+        }
+        else if(event->key() == Qt::Key_Escape)
+        {
+            SkipCurrentImage();
         }
     }
 
