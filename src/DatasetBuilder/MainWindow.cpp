@@ -56,7 +56,7 @@ namespace DatasetBuilder
 
             ui->m_lblImg->setPixmap(
                     QPixmap::fromImage(
-                            CvMatToQImage(square)
+                            ImageUtil::CvMatToQImage(square)
                             )
                     );
         }

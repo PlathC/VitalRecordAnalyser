@@ -15,13 +15,25 @@ find_package(OpenCV REQUIRED)
 set(HEADERS
         "include/DatasetBuilder/MainWindow.hpp"
         "include/DatasetBuilder/DatasetImage.hpp"
-        include/DatasetBuilder/ImageSet.hpp)
+        "include/DatasetBuilder/ImageSet.hpp"
+        "include/ImageUtil.hpp"
+        "include/TextSegmentation/Binarization.hpp"
+        "include/TextSegmentation/LineSegmentation.hpp"
+        "include/TextSegmentation/Scanner.hpp"
+        "include/TextSegmentation/WordSegmentation.hpp"
+        "include/TextSegmentation/TextSegmentation.hpp"
+        )
 
 set(SOURCES
         "src/main.cpp"
         "src/DatasetBuilder/MainWindow.cpp"
-        src/DatasetBuilder/DatasetImage.cpp
-        src/DatasetBuilder/ImageSet.cpp
+        "src/DatasetBuilder/DatasetImage.cpp"
+        "src/DatasetBuilder/ImageSet.cpp"
+        "src/TextSegmentation/Binarization.cpp"
+        "src/TextSegmentation/LineSegmentation.cpp"
+        "src/TextSegmentation/Scanner.cpp"
+        "src/TextSegmentation/WordSegmentation.cpp"
+        "src/DatasetBuilder/TextSegmentation.cpp"
         )
 set(UI
         "src/DatasetBuilder/MainWindow.ui")
