@@ -6,84 +6,74 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1071</width>
-    <height>600</height>
+    <width>1074</width>
+    <height>607</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="gridLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>0</y>
-      <width>621</width>
-      <height>551</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="0">
-      <widget class="QPushButton" name="m_pbSkip">
-       <property name="text">
-        <string>Skip</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="m_lblImg">
-       <property name="text">
-        <string>No image yet</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="gridLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>810</x>
-      <y>0</y>
-      <width>251</width>
-      <height>551</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout_2">
-     <item row="1" column="1">
-      <widget class="QTextEdit" name="m_teImg"/>
-     </item>
-     <item row="2" column="1">
-      <widget class="QPushButton" name="m_pbSave">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>191</width>
-      <height>551</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QListWidget" name="listWidget"/>
-     </item>
-    </layout>
-   </widget>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QListWidget" name="m_lwRemainingFolders"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="0">
+       <widget class="QPushButton" name="m_pbSkip">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Skip</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_lblImg">
+        <property name="minimumSize">
+         <size>
+          <width>600</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>No image yet</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="m_laySave">
+      <item row="1" column="1">
+       <widget class="QPushButton" name="m_pbSave">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="m_leTextImg"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1071</width>
+     <width>1074</width>
      <height>21</height>
     </rect>
    </property>
@@ -92,6 +82,7 @@
      <string>File</string>
     </property>
     <addaction name="m_acInputFolders"/>
+    <addaction name="m_acOutputFolder"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -99,6 +90,11 @@
   <action name="m_acInputFolders">
    <property name="text">
     <string>Select input folders</string>
+   </property>
+  </action>
+  <action name="m_acOutputFolder">
+   <property name="text">
+    <string>Select output folder</string>
    </property>
   </action>
  </widget>

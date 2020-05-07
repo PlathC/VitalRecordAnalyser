@@ -6,11 +6,14 @@
 #define CIVILREGISTRYANALYSER_MAINWINDOW_HPP
 
 #include <stack>
+#include <vector>
 
 #include <QDebug>
 #include <QFileDialog>
+#include <QKeyEvent>
 #include <QListView>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QTreeView>
 
 #include "DatasetBuilder/ImageSet.hpp"
@@ -29,6 +32,7 @@ namespace DatasetBuilder
         explicit MainWindow(QWidget* parent = nullptr);
         void UpdateUi();
         void SelectInputFolders();
+        void SelectOutputFolder();
 
         inline QImage CvMatToQImage( const cv::Mat &inMat );
 
@@ -36,19 +40,24 @@ namespace DatasetBuilder
     private slots:
         void SkipCurrentImage();
         void Save();
+        void keyPressEvent(QKeyEvent *event);
+
     private:
         void NextImage(bool save);
 
     private:
         Ui::MainWindow *ui;
-        std::stack<DatasetBuilder::ImageSet> m_sets;
+        std::vector<DatasetBuilder::ImageSet> m_sets;
         DatasetBuilder::DatasetImage* m_currentImg = nullptr;
         DatasetBuilder::ImageSet* m_currentSet = nullptr;
+
+        bool m_outputFolderSelected = false;
+        std::string m_outputFolder;
     };
 
     inline QImage MainWindow::CvMatToQImage( const cv::Mat &inMat )
     {
-        switch ( inMat.type() )
+        switch (inMat.type())
         {
             // 8-bit, 4 channel
             case CV_8UC4:

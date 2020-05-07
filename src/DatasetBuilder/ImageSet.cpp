@@ -41,15 +41,25 @@ namespace DatasetBuilder{
         auto& top = m_images.top();
         if(save)
         {
-            top.Save(m_folderPath);
+            top.Save(m_outputFolder);
         }
         m_images.pop();
 
         return m_images.size();
     }
 
-    std::string& ImageSet::OutputFolder()
+    const std::string& ImageSet::FolderPath() const
+    {
+        return m_folderPath;
+    }
+
+    const std::string& ImageSet::OutputFolder() const
     {
         return m_outputFolder;
+    }
+
+    void ImageSet::SetOutputFolder(const std::string& folder)
+    {
+        m_outputFolder = folder;
     }
 }

@@ -19,7 +19,10 @@ namespace DatasetBuilder
 
         DatasetImage& CurrentImage();
         int Skip(bool save);
-        std::string& OutputFolder();
+
+        const std::string& FolderPath() const;
+        const std::string& ImageSet::OutputFolder() const;
+        void SetOutputFolder(const std::string& folder);
     private:
         static const std::array<std::string, 3> SupportedImageFiles;
 

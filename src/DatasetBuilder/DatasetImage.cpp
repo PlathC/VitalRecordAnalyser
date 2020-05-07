@@ -12,10 +12,10 @@ namespace DatasetBuilder {
 
     void DatasetImage::Save(const std::string& outputFolder) const
     {
-        std::string fileName = outputFolder + m_srcPath.stem().string();
+        std::string fileName = outputFolder + "/" + m_srcPath.filename().string();
         cv::imwrite(fileName + ".jpg", m_src);
 
-        std::ofstream outfile ("test.txt");
+        std::ofstream outfile (fileName + ".txt");
         outfile << m_text << std::endl;
         outfile.close();
     }

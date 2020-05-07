@@ -16,6 +16,10 @@ namespace DatasetBuilder
                 &QAction::triggered,
                 [&](){ SelectInputFolders(); }
                 );
+        QObject::connect(ui->m_acOutputFolder,
+                 &QAction::triggered,
+                 [&](){ SelectOutputFolder(); }
+        );
     }
 
     void MainWindow::UpdateUi()
@@ -62,6 +66,11 @@ namespace DatasetBuilder
             ui->m_pbSkip->setEnabled(false);
             ui->m_pbSave->setEnabled(false);
         }
+        ui->m_lwRemainingFolders->clear();
+        for(const auto& set : m_sets)
+        {
+            ui->m_lwRemainingFolders->addItem(QString::fromStdString(set.FolderPath()));
+        }
     }
 
     void MainWindow::SelectInputFolders()
@@ -84,16 +93,43 @@ namespace DatasetBuilder
         {
             QStringList files = dialog->selectedFiles();
             for(const auto& file : files)
-                m_sets.push(DatasetBuilder::ImageSet(file.toStdString()));
+                m_sets.emplace_back(file.toStdString());
 
             if(!m_currentImg)
             {
-                m_currentSet = &m_sets.top();
+                m_currentSet = &m_sets.back();
+                m_currentSet->SetOutputFolder(m_outputFolder);
                 m_currentImg = &m_currentSet->CurrentImage();
             }
 
             UpdateUi();
+
+            if(!m_outputFolderSelected)
+            {
+                QMessageBox::information(this,
+                        "Missing data",
+                        "You did not select the output folder yet which is needed for saving files",
+                        QMessageBox::Ok);
+                SelectOutputFolder();
+            }
+
+            ui->m_pbSave->setEnabled(true);
+            ui->m_pbSkip->setEnabled(true);
         }
+    }
+
+    void MainWindow::SelectOutputFolder()
+    {
+        auto* dialog = new QFileDialog(this);
+        dialog->setFileMode(QFileDialog::DirectoryOnly);
+        while(!dialog->exec())
+        {}
+
+        QStringList files = dialog->selectedFiles();
+        m_outputFolder = files.takeFirst().toStdString();
+        m_outputFolderSelected = true;
+        if(m_currentSet)
+            m_currentSet->SetOutputFolder(m_outputFolder);
     }
 
     void MainWindow::SkipCurrentImage()
@@ -103,8 +139,20 @@ namespace DatasetBuilder
 
     void MainWindow::Save()
     {
-        m_currentImg->Text(ui->m_teImg->toPlainText().toStdString());
+        m_currentImg->Text(ui->m_leTextImg->text().toStdString());
         NextImage(true);
+    }
+
+    void MainWindow::keyPressEvent(QKeyEvent *event)
+    {
+        if( event->key() == Qt::Key_Enter)
+        {
+            if(ui->m_leTextImg->hasFocus())
+            {
+                Save();
+                ui->m_leTextImg->clear();
+            }
+        }
     }
 
     void MainWindow::NextImage(bool save)
@@ -113,10 +161,11 @@ namespace DatasetBuilder
         {
             if(!m_currentSet->Skip(save))
             {
-                m_sets.pop();
+                m_sets.pop_back();
                 if(!m_sets.empty())
                 {
-                    m_currentSet = &m_sets.top();
+                    m_currentSet = &m_sets.back();
+                    m_currentSet->SetOutputFolder(m_outputFolder);
                     m_currentImg = &m_currentSet->CurrentImage();
                 }
                 else
