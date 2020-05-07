@@ -1,4 +1,4 @@
-#include "Binarization.hpp"
+#include "TextSegmentation/Binarization.hpp"
 
 #define uget(x,y)at<unsigned char>(y,x)
 #define uset(x,y,v)at<unsigned char>(y,x)=v;

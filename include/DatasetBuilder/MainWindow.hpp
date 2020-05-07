@@ -42,7 +42,7 @@ namespace DatasetBuilder
     private slots:
         void SkipCurrentImage();
         void Save();
-        void keyPressEvent(QKeyEvent *event);
+        void keyPressEvent(QKeyEvent *event) override;
 
     private:
         void NextImage(bool save);

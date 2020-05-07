@@ -1,4 +1,4 @@
-#include "LineSegmentation.hpp"
+#include "TextSegmentation/LineSegmentation.hpp"
 
 LineSegmentation::LineSegmentation() {
     sieve();

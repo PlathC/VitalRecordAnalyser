@@ -1,4 +1,4 @@
-#include "WordSegmentation.hpp"
+#include "TextSegmentation/WordSegmentation.hpp"
 
 WordSegmentation::WordSegmentation() {};
 

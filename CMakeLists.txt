@@ -35,6 +35,7 @@ set(SOURCES
         "src/TextSegmentation/WordSegmentation.cpp"
         "src/DatasetBuilder/TextSegmentation.cpp"
         )
+
 set(UI
         "src/DatasetBuilder/MainWindow.ui")
 
