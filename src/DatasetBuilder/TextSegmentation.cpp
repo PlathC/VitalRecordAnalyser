@@ -109,8 +109,8 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
     int newH = ((newW * imageCropped.rows) / imageCropped.cols);
     cv::resize(imageCropped, imageCropped, cv::Size(newW, newH));
 
-    int chunksNumber = 32;
-    int chunksProcess = 16;
+    int chunksNumber = 8;
+    int chunksProcess = 4;
     // END Step 1.1 //
 
 
