@@ -7,7 +7,7 @@ algorithms.
 
 ### Dependency
 
-- OpenCv (Tested with == 4.0.1)
+- OpenCv (Tested with >= 4.0.1)
 - Qt (Tested with >= 5.11.2)
 
 ### Build
