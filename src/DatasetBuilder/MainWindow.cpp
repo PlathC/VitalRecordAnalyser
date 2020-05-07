@@ -83,11 +83,11 @@ namespace DatasetBuilder
 
         auto* fileView = dialog->findChild<QListView*>("listView");
         if(fileView)
-            fileView->setSelectionMode(QAbstractItemView::MultiSelection);
+            fileView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
         auto* fileTreeView = dialog->findChild<QTreeView*>();
         if(fileTreeView)
-            fileTreeView->setSelectionMode(QAbstractItemView::MultiSelection);
+            fileTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
         if(dialog->exec())
         {
