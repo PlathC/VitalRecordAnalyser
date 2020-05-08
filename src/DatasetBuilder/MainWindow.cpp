@@ -133,6 +133,7 @@ namespace DatasetBuilder
 
     void MainWindow::Save()
     {
+        m_currentImg->Name(std::to_string(m_imgCount++));
         m_currentImg->Text(ui->m_leTextImg->text().toStdString());
         NextImage(true);
     }
