@@ -26,7 +26,7 @@ namespace DatasetBuilder
 
         void Name(const std::string& nName);
         void Text(const std::string& nText);
-        const cv::Mat& Image() const;
+        [[nodiscard]] const cv::Mat& Image() const;
     private:
         cv::Mat m_src;
         std::string m_name;

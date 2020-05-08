@@ -27,14 +27,22 @@ namespace DatasetBuilder{
             if(isFileSupported)
             {
                 TextSegmentation segmentor = TextSegmentation(file.string(), workingDir);
-                std::vector<cv::Mat> imageList = segmentor.Process();
+                std::vector<cv::Mat> imageList;// = segmentor.Process();
                 for(const auto& image : imageList)
                 {
                     m_images.push(DatasetImage(image, outputFolder));
                 }
             }
         }
+    }
 
+    ImageSet::ImageSet(const std::vector<cv::Mat>& images, const std::string& outputFolder):
+            m_outputFolder(outputFolder)
+    {
+        for(const auto& img: images)
+        {
+            m_images.push(DatasetImage(img, outputFolder));
+        }
     }
 
     DatasetImage& ImageSet::CurrentImage()

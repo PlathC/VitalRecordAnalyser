@@ -16,6 +16,7 @@ namespace DatasetBuilder
                 &QAction::triggered,
                 [&](){ SelectInputFolders(); }
                 );
+
         QObject::connect(ui->m_acOutputFolder,
                  &QAction::triggered,
                  [&](){ SelectOutputFolder(); }
@@ -85,8 +86,16 @@ namespace DatasetBuilder
             QStringList files = dialog->selectedFiles();
             for(const auto& file : files)
             {
-                m_sets.emplace_back(DatasetBuilder::ImageSet(file.toStdString(), m_outputFolder));
-                QMessageBox::information(this, "Success", "File " + file + " extracted !");
+                ImageSegmenterDialog* segmenterDialog = new ImageSegmenterDialog(file, QString::fromStdString(m_outputFolder), this);
+
+                if(segmenterDialog->exec())
+                {
+                    auto images = segmenterDialog->GetImages();
+                    if(!images.empty())
+                        m_sets.emplace_back(images, m_outputFolder);
+                }
+                //m_sets.emplace_back(DatasetBuilder::ImageSet(file.toStdString(), m_outputFolder));
+                //QMessageBox::information(this, "Success", "File " + file + " extracted !");
             }
 
             if(!m_currentImg)

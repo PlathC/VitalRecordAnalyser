@@ -16,6 +16,7 @@ set(HEADERS
         "include/DatasetBuilder/MainWindow.hpp"
         "include/DatasetBuilder/DatasetImage.hpp"
         "include/DatasetBuilder/ImageSet.hpp"
+        "include/DatasetBuilder/ImageSegmenterDialog.hpp"
         "include/ImageUtil.hpp"
         "include/TextSegmentation/Binarization.hpp"
         "include/TextSegmentation/LineSegmentation.hpp"
@@ -29,17 +30,21 @@ set(SOURCES
         "src/DatasetBuilder/MainWindow.cpp"
         "src/DatasetBuilder/DatasetImage.cpp"
         "src/DatasetBuilder/ImageSet.cpp"
+        "src/DatasetBuilder/ImageSegmenterDialog.cpp"
         "src/TextSegmentation/Binarization.cpp"
         "src/TextSegmentation/LineSegmentation.cpp"
         "src/TextSegmentation/Scanner.cpp"
         "src/TextSegmentation/WordSegmentation.cpp"
-        "src/DatasetBuilder/TextSegmentation.cpp"
+        "src/TextSegmentation/TextSegmentation.cpp"
         )
 
 set(UI
-        "src/DatasetBuilder/MainWindow.ui")
+        "src/DatasetBuilder/MainWindow.ui"
+        "src/DatasetBuilder/ImageSegmenterDialog.ui"
+        )
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${UI})
+
 target_compile_options(${PROJECT_NAME} INTERFACE)
 if (CMAKE_COMPILER_IS_GNUCC)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wwrite-strings -std=c++17 -Wno-psabi -Wno-unused-parameter -Wno-ignored-qualifiers -Wno-deprecated -lstdc++fs)

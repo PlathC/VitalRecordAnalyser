@@ -18,7 +18,55 @@ TextSegmentation::TextSegmentation(const std::string& src, const std::string& ou
     fs::create_directories(m_outputPath);
 }
 
-std::vector<cv::Mat> TextSegmentation::Process()
+TextSegmentation::TextSegmentation(TextSegmentation&& oldTextSegmentation) noexcept:
+        m_progress(oldTextSegmentation.m_progress),
+        m_src(oldTextSegmentation.m_src),
+        m_outputPath(oldTextSegmentation.m_outputPath),
+        m_name(oldTextSegmentation.m_name),
+        m_extension(oldTextSegmentation.m_extension),
+        m_wordsPath(oldTextSegmentation.m_wordsPath),
+        m_thread(std::move(oldTextSegmentation.m_thread))
+{
+}
+
+TextSegmentation& TextSegmentation::operator=(TextSegmentation&& oldTextSegmentation) noexcept
+{
+    m_progress = oldTextSegmentation.m_progress;
+    m_src = oldTextSegmentation.m_src;
+    m_outputPath = oldTextSegmentation.m_outputPath;
+    m_name = oldTextSegmentation.m_name;
+    m_extension = oldTextSegmentation.m_extension;
+    m_wordsPath = oldTextSegmentation.m_wordsPath;
+
+    m_thread = std::move(oldTextSegmentation.m_thread);
+    return *this;
+}
+
+void TextSegmentation::Start()
+{
+    m_thread = std::thread([&](){
+        this->Process();
+    });
+}
+
+void TextSegmentation::Join()
+{
+    m_thread.join();
+}
+
+uint8_t TextSegmentation::Progress()
+{
+    std::lock_guard lock{m_progressLocker};
+    return m_progress;
+}
+
+std::vector<cv::Mat> TextSegmentation::GetExtractedWords()
+{
+    std::lock_guard lock{m_imagesLock};
+    return m_processedImages;
+}
+
+void TextSegmentation::Process()
 {
     std::vector<cv::Mat> detectedWords;
     cv::Mat blurred;
@@ -76,12 +124,18 @@ std::vector<cv::Mat> TextSegmentation::Process()
     }
     cv::imwrite(m_outputPath + "/" + "CONTOURS.png", contourImg);
 
+    m_progressLocker.lock();
+    m_progress = 20;
+    m_progressLocker.unlock();
+
     int i = 0;
     detectedArea.erase(std::remove_if(detectedArea.begin(), detectedArea.end(), [](const auto& img ) -> bool
     {
         return img.cols*2 < img.rows;
     }), detectedArea.end());
 
+
+    uint8_t step = 80 / detectedArea.size();
     for(const auto& img : detectedArea)
     {
         cv::imwrite(m_outputPath + "/" + std::to_string(i) + ".png", img);
@@ -89,10 +143,18 @@ std::vector<cv::Mat> TextSegmentation::Process()
         std::cout << std::to_string(i++) << "/" << detectedArea.size() << std::endl;
 
         std::vector<cv::Mat> extracted = ExtractWords(img);
+
         detectedWords.insert(detectedWords.begin(), extracted.begin(), extracted.end());
+
+        std::lock_guard lock{m_progressLocker};
+        m_progress += step;
     }
 
-    return detectedWords;
+    std::lock_guard lockImg{m_imagesLock};
+    m_processedImages.insert(m_processedImages.begin(), detectedWords.begin(), detectedWords.end());
+    std::lock_guard lockProgress{m_progressLocker};
+    m_progress = 100;
+    //return detectedWords;
 }
 
 std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
@@ -175,16 +237,6 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
             wordsSave.push_back(words[j]);
         }
     }
-
-    //fs::path saveSeparateLine = m_outputPath;
-//
-    //for (int i=0; i<summary.size(); i++){
-    //    std::string index = "_4_summary_" + std::to_string((i+1)*1e-6).substr(5);
-    //    std::string separateLineName = m_name + index + m_extension;
-    //    fs::path saveLine = saveSeparateLine / separateLineName;
-    //    cv::imwrite(saveLine.u8string(), summary[i]);
-    //}
-    // END Step 4 //
 
     return wordsSave;
 }

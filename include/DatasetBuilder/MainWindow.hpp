@@ -19,7 +19,7 @@
 #include "ImageUtil.hpp"
 
 #include "DatasetBuilder/ImageSet.hpp"
-
+#include "DatasetBuilder/ImageSegmenterDialog.hpp"
 
 namespace Ui
 {

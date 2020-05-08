@@ -18,12 +18,13 @@ namespace DatasetBuilder
     {
     public:
         explicit ImageSet(const std::string& path, const std::string& outputFolder = "");
+        explicit ImageSet(const std::vector<cv::Mat>& images, const std::string& outputFolder = "");
 
         DatasetImage& CurrentImage();
         int Skip(bool save);
 
-        const std::string& FolderPath() const;
-        const std::string& ImageSet::OutputFolder() const;
+        [[nodiscard]] const std::string& FolderPath() const;
+        [[nodiscard]] const std::string& ImageSet::OutputFolder() const;
         void SetOutputFolder(const std::string& folder);
     private:
         static const std::array<std::string, 3> SupportedImageFiles;
