@@ -6,18 +6,27 @@
 
 namespace DatasetBuilder {
     DatasetImage::DatasetImage(const std::string& path) :
-        m_src(cv::imread(path)),
-        m_srcPath(path)
-    {}
+        m_src(cv::imread(path))
+    {
+        auto imgPath = fs::path(path);
+        m_name = imgPath.filename().string();
+    }
 
-    DatasetImage::DatasetImage(const cv::Mat& src, const std::string& path) :
-            m_src(src),
-            m_srcPath(path)
-    {}
+    DatasetImage::DatasetImage(const cv::Mat& src, const std::string& name) :
+            m_src(src)
+    {
+        auto imgPath = fs::path(name);
+        m_name = imgPath.filename().string();
+    }
+
+    void DatasetImage::Name(const std::string& nName)
+    {
+        m_name = nName;
+    }
 
     void DatasetImage::Save(const std::string& outputFolder) const
     {
-        std::string fileName = outputFolder + "/" + m_srcPath.filename().string();
+        std::string fileName = outputFolder + "/" + m_name;
         cv::imwrite(fileName + ".jpg", m_src);
 
         std::ofstream outfile (fileName + ".txt");

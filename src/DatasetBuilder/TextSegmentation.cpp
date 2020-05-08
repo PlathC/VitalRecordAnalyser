@@ -77,17 +77,19 @@ std::vector<cv::Mat> TextSegmentation::Process()
     cv::imwrite(m_outputPath + "/" + "CONTOURS.png", contourImg);
 
     int i = 0;
+    detectedArea.erase(std::remove_if(detectedArea.begin(), detectedArea.end(), [](const auto& img ) -> bool
+    {
+        return img.cols*2 < img.rows;
+    }), detectedArea.end());
+
     for(const auto& img : detectedArea)
     {
-        if(img.cols*2 > img.rows)
-        {
-            cv::imwrite(m_outputPath + "/" + std::to_string(i) + ".png", img);
-            std::cout << "Writing into " + m_outputPath + "/" << std::endl;
-            std::cout << std::to_string(i++) << "/" << detectedArea.size() << std::endl;
+        cv::imwrite(m_outputPath + "/" + std::to_string(i) + ".png", img);
+        std::cout << "Writing into " + m_outputPath + "/" << std::endl;
+        std::cout << std::to_string(i++) << "/" << detectedArea.size() << std::endl;
 
-            std::vector<cv::Mat> extracted = ExtractWords(img);
-            detectedWords.insert(detectedWords.begin(), extracted.begin(), extracted.end());
-        }
+        std::vector<cv::Mat> extracted = ExtractWords(img);
+        detectedWords.insert(detectedWords.begin(), extracted.begin(), extracted.end());
     }
 
     return detectedWords;
@@ -159,15 +161,18 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
         summary.push_back(words[0]);
         words.erase(words.begin());
 
+        words.erase(std::remove_if(words.begin(), words.end(), [](const auto& img ) -> bool
+        {
+            return img.cols < 100;
+        }), words.end());
+
         fs::create_directories(m_wordsPath);
-        for (int j=0; j<words.size(); j++) {
-            if(words[j].cols > 100)
-            {
-                std::string wordIndex = lineIndex + "_" + std::to_string((j + 1) * 1e-6).substr(5);
-                fs::path saveWord = m_wordsPath / (wordIndex + m_extension);
-                cv::imwrite(saveWord.u8string(), words[j]);
-                wordsSave.push_back(words[j]);
-            }
+        for (int j=0; j<words.size(); j++)
+        {
+            std::string wordIndex = lineIndex + "_" + std::to_string((j + 1) * 1e-6).substr(5);
+            fs::path saveWord = m_wordsPath / (wordIndex + m_extension);
+            cv::imwrite(saveWord.u8string(), words[j]);
+            wordsSave.push_back(words[j]);
         }
     }
 
