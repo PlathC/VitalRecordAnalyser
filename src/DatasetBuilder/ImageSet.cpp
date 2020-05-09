@@ -57,15 +57,16 @@ namespace DatasetBuilder{
         {
             if(!m_srcSaved)
             {
-                cv::imwrite(m_outputFolder + '/' + m_inputPath.filename().string() + ".png", m_src);
-                fs::create_directory(m_outputFolder + '/' + m_inputPath.filename().string());
+                cv::imwrite(m_outputFolder + '/' + m_inputPath.stem().string() + ".png", m_src);
+                fs::create_directory(m_outputFolder + '/' + m_inputPath.stem().string());
                 m_srcSaved = true;
             }
 
             top.Name(std::to_string(m_imgCount++));
-            top.Save(m_outputFolder + '/' + m_inputPath.filename().string(),
+            top.Save(m_outputFolder,
+                    m_inputPath.stem().string(),
                     m_transcriptionPath,
-                    m_inputPath.filename().string() + ".png");
+                    m_outputFolder + '/'+ m_inputPath.stem().string() + ".png");
         }
         m_images.pop();
 

@@ -22,7 +22,7 @@ namespace DatasetBuilder
         explicit DatasetImage(const std::string& path);
         explicit DatasetImage(const cv::Mat& src, const std::string& name);
 
-        void Save(const std::string& outputFolder, const fs::path& transcriptionPath, const std::string& originalImgName) const;
+        void Save(const std::string& outputRoot, const std::string& segmentsFolder, const fs::path& transcriptionPath, const std::string& originalImgPath) const;
 
         void Name(const std::string& nName);
         void Text(const std::string& nText);

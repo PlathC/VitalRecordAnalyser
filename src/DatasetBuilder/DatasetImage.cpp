@@ -30,26 +30,22 @@ namespace DatasetBuilder {
         m_name = nName;
     }
 
-    void DatasetImage::Save(const std::string& outputFolder, const fs::path& transcriptionPath, const std::string& originalImgName) const
+    void DatasetImage::Save(const std::string& outputFolder, const std::string& segmentsFolder, const fs::path& transcriptionPath, const std::string& originalImgPath) const
     {
-        std::string fileName = outputFolder + "/" + m_name;
-        cv::imwrite(fileName + ".png", m_src);
+        std::string fileName = outputFolder + "/" + segmentsFolder + "/" + m_name + ".png";
+        cv::imwrite(fileName, m_src);
 
         std::ifstream iTranscription(transcriptionPath);
         json transcription;
-        iTranscription >> transcription;
+        if(iTranscription.peek() != std::ifstream::traits_type::eof())
+            iTranscription >> transcription;
         iTranscription.close();
 
-        transcription[originalImgName][fs::relative(fileName, outputFolder).string()] = m_text;
+        transcription[fs::relative(originalImgPath, outputFolder).string()][fs::relative(fileName, outputFolder).string()] = m_text;
 
         std::ofstream oTranscription(transcriptionPath, std::ofstream::trunc);
         oTranscription << std::setw(4) << transcription << std::endl;
         oTranscription.close();
-
-
-//        std::ofstream outfile (fileName + ".txt");
-//        outfile << m_text << std::endl;
-//        outfile.close();
     }
 
     void DatasetImage::Text(const std::string& nText) { m_text = nText; }

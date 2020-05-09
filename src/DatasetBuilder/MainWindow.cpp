@@ -158,6 +158,7 @@ namespace DatasetBuilder
     {
         m_currentImg->Text(ui->m_leTextImg->text().toStdString());
         NextImage(true);
+        ui->m_leTextImg->clear();
     }
 
     void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -167,7 +168,6 @@ namespace DatasetBuilder
             if(ui->m_leTextImg->hasFocus())
             {
                 Save();
-                ui->m_leTextImg->clear();
             }
         }
         else if(event->key() == Qt::Key_Escape)
