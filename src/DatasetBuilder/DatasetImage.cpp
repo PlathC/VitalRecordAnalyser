@@ -4,6 +4,12 @@
 
 #include "DatasetBuilder/DatasetImage.hpp"
 
+#include <iostream>
+
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 namespace DatasetBuilder {
     DatasetImage::DatasetImage(const std::string& path) :
         m_src(cv::imread(path))
@@ -24,14 +30,32 @@ namespace DatasetBuilder {
         m_name = nName;
     }
 
-    void DatasetImage::Save(const std::string& outputFolder) const
+    void DatasetImage::Save(const std::string& outputFolder, const fs::path& transcriptionPath, const std::string& originalImgName) const
     {
         std::string fileName = outputFolder + "/" + m_name;
         cv::imwrite(fileName + ".png", m_src);
+        json transcription;
 
-        std::ofstream outfile (fileName + ".txt");
-        outfile << m_text << std::endl;
-        outfile.close();
+        try {
+            std::ifstream iTranscription(transcriptionPath);
+            iTranscription >> transcription;
+            iTranscription.close();
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+
+        transcription[originalImgName][fileName] = m_text;
+
+        std::ofstream oTranscription(transcriptionPath, std::ofstream::trunc);
+        oTranscription << std::setw(4) << transcription << std::endl;
+        oTranscription.close();
+
+
+//        std::ofstream outfile (fileName + ".txt");
+//        outfile << m_text << std::endl;
+//        outfile.close();
     }
 
     void DatasetImage::Text(const std::string& nText) { m_text = nText; }

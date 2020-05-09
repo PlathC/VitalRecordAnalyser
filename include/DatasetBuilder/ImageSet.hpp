@@ -29,10 +29,12 @@ namespace DatasetBuilder
         [[nodiscard]] const fs::path& SourceImage() const;
         [[nodiscard]] const std::string& ImageSet::OutputFolder() const;
         void SetOutputFolder(const std::string& folder);
+        void SetTranscriptionPath(const fs::path& file);
     private:
         static const std::array<std::string, 3> SupportedImageFiles;
 
         fs::path m_inputPath;
+        fs::path m_transcriptionPath;
         std::string m_outputFolder;
         std::stack<DatasetImage> m_images;
         cv::Mat m_src;

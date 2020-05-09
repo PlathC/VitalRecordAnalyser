@@ -63,7 +63,9 @@ namespace DatasetBuilder{
             }
 
             top.Name(std::to_string(m_imgCount++));
-            top.Save(m_outputFolder + '/' + m_inputPath.filename().string());
+            top.Save(m_outputFolder + '/' + m_inputPath.filename().string(),
+                    m_transcriptionPath,
+                    m_inputPath.filename().string() + ".png");
         }
         m_images.pop();
 
@@ -83,5 +85,10 @@ namespace DatasetBuilder{
     void ImageSet::SetOutputFolder(const std::string& folder)
     {
         m_outputFolder = folder;
+    }
+
+    void ImageSet::SetTranscriptionPath(const fs::path& file)
+    {
+        m_transcriptionPath = file;
     }
 }

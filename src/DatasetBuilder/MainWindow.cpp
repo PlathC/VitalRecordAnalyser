@@ -131,9 +131,18 @@ namespace DatasetBuilder
 
         QStringList files = dialog->selectedFiles();
         m_outputFolder = files.takeFirst().toStdString();
+        m_transcriptionPath = m_outputFolder + "/transcription.json";
+        if(!fs::exists(m_transcriptionPath))
+        {
+            std::ofstream transcriptionFile(m_transcriptionPath);
+            transcriptionFile.close();
+        }
         m_outputFolderSelected = true;
         if(m_currentSet)
+        {
             m_currentSet->SetOutputFolder(m_outputFolder);
+            m_currentSet->SetTranscriptionPath(m_transcriptionPath);
+        }
     }
 
     void MainWindow::SkipCurrentImage()
@@ -174,6 +183,7 @@ namespace DatasetBuilder
                 {
                     m_currentSet = &m_sets.back();
                     m_currentSet->SetOutputFolder(m_outputFolder);
+                    m_currentSet->SetTranscriptionPath(m_transcriptionPath);
                     m_currentImg = &m_currentSet->CurrentImage();
                 }
                 else
