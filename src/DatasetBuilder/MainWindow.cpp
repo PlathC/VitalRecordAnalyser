@@ -99,6 +99,9 @@ namespace DatasetBuilder
                 }
             }
 
+            if(m_sets.empty())
+                return;
+
             if(!m_currentImg)
             {
                 m_currentSet = &m_sets.back();
