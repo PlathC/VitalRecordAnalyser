@@ -12,6 +12,9 @@ set(CMAKE_AUTORCC ON)
 
 find_package(OpenCV REQUIRED)
 
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(thirdparty/json)
+
 set(HEADERS
         "include/DatasetBuilder/MainWindow.hpp"
         "include/DatasetBuilder/DatasetImage.hpp"
@@ -62,6 +65,7 @@ endif ()
 
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets
         ${OpenCV_LIBS} )
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
