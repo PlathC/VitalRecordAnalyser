@@ -27,7 +27,7 @@ namespace DatasetBuilder {
     void DatasetImage::Save(const std::string& outputFolder) const
     {
         std::string fileName = outputFolder + "/" + m_name;
-        cv::imwrite(fileName + ".jpg", m_src);
+        cv::imwrite(fileName + ".png", m_src);
 
         std::ofstream outfile (fileName + ".txt");
         outfile << m_text << std::endl;

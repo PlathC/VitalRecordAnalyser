@@ -36,6 +36,7 @@ namespace DatasetBuilder{
 
     ImageSet::ImageSet(const std::string& path, const std::vector<cv::Mat>& images, const std::string& outputFolder):
             m_inputPath(path),
+            m_src(cv::imread(path)),
             m_outputFolder(outputFolder)
     {
         for(const auto& img: images)
@@ -56,13 +57,13 @@ namespace DatasetBuilder{
         {
             if(!m_srcSaved)
             {
-                cv::imwrite(m_outputFolder + m_inputPath.filename().string() + ".png", m_src);
+                cv::imwrite(m_outputFolder + '/' + m_inputPath.filename().string() + ".png", m_src);
                 fs::create_directory(m_outputFolder + '/' + m_inputPath.filename().string());
                 m_srcSaved = true;
             }
 
             top.Name(std::to_string(m_imgCount++));
-            top.Save(m_outputFolder + m_inputPath.filename().string());
+            top.Save(m_outputFolder + '/' + m_inputPath.filename().string());
         }
         m_images.pop();
 
