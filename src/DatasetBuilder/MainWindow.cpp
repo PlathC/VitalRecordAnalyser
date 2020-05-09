@@ -106,6 +106,7 @@ namespace DatasetBuilder
             {
                 m_currentSet = &m_sets.back();
                 m_currentSet->SetOutputFolder(m_outputFolder);
+                m_currentSet->SetTranscriptionPath(m_transcriptionPath);
                 m_currentImg = &m_currentSet->CurrentImage();
             }
 

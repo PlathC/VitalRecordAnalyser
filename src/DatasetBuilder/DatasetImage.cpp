@@ -34,19 +34,13 @@ namespace DatasetBuilder {
     {
         std::string fileName = outputFolder + "/" + m_name;
         cv::imwrite(fileName + ".png", m_src);
+
+        std::ifstream iTranscription(transcriptionPath);
         json transcription;
+        iTranscription >> transcription;
+        iTranscription.close();
 
-        try {
-            std::ifstream iTranscription(transcriptionPath);
-            iTranscription >> transcription;
-            iTranscription.close();
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
-
-        transcription[originalImgName][fileName] = m_text;
+        transcription[originalImgName][fs::relative(fileName, outputFolder).string()] = m_text;
 
         std::ofstream oTranscription(transcriptionPath, std::ofstream::trunc);
         oTranscription << std::setw(4) << transcription << std::endl;
