@@ -38,13 +38,12 @@ set(SOURCES
         "src/TextSegmentation/LineSegmentation.cpp"
         "src/TextSegmentation/Scanner.cpp"
         "src/TextSegmentation/WordSegmentation.cpp"
-        "src/TextSegmentation/TextSegmentation.cpp"
-        )
+        "src/TextSegmentation/TextSegmentation.cpp")
 
 set(UI
         "src/DatasetBuilder/DatasetBuilder.ui"
         "src/DatasetBuilder/ImageSegmenterDialog.ui"
-        )
+    )
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${UI})
 
@@ -55,7 +54,7 @@ elseif (MSVC)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_compile_options(${PROJECT_NAME} PRIVATE /std:c++17 /Zc:__cplusplus /MDd /Od /EHsc /wd4996 /Zi /wd4634 /wd4635)
     else()
-        target_compile_options(${PROJECT_NAME} PRIVATE /std:c++17 /Zc:__cplusplus /DNDEBUG /O2 /Ob2 /EHsc /MT /Zi /wd4996 /wd4634 /wd4635)
+        target_compile_options(${PROJECT_NAME} PRIVATE /std:c++17 /Zc:__cplusplus /DNDEBUG /O2 /Ob2 /EHsc /Zi /wd4996 /wd4634 /wd4635)
     endif()
 
     if(MARIONETTE_DYNAMIC)

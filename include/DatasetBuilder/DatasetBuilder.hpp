@@ -49,9 +49,9 @@ namespace DatasetBuilder
 
     private:
         Ui::DatasetBuilder *ui;
-        std::vector<DatasetBuilder::ImageSet> m_sets;
-        DatasetBuilder::DatasetImage* m_currentImg = nullptr;
-        DatasetBuilder::ImageSet* m_currentSet = nullptr;
+        std::vector<ImageSet> m_sets;
+        DatasetImage* m_currentImg = nullptr;
+        ImageSet* m_currentSet = nullptr;
 
         bool m_outputFolderSelected = false;
         std::string m_outputFolder;

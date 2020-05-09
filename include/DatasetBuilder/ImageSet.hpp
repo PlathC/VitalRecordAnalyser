@@ -26,6 +26,7 @@ namespace DatasetBuilder
         DatasetImage& CurrentImage();
         int Skip(bool save);
 
+        [[nodiscard]] uint16_t Size() const;
         [[nodiscard]] const fs::path& SourceImage() const;
         [[nodiscard]] const std::string& ImageSet::OutputFolder() const;
         void SetOutputFolder(const std::string& folder);

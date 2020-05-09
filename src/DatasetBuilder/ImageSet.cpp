@@ -73,6 +73,11 @@ namespace DatasetBuilder{
         return m_images.size();
     }
 
+    uint16_t ImageSet::Size() const
+    {
+        return m_images.size();
+    }
+
     const fs::path& ImageSet::SourceImage() const
     {
         return m_inputPath;

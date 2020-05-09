@@ -70,7 +70,8 @@ namespace DatasetBuilder
         ui->m_lwRemainingFolders->clear();
         for(const auto& set : m_sets)
         {
-            ui->m_lwRemainingFolders->addItem(QString::fromStdString(set.SourceImage().string()));
+            ui->m_lwRemainingFolders->addItem(QString::fromStdString(set.SourceImage().filename().string())
+                    + "(" + QString::number(set.Size()) + ")");
         }
     }
 
