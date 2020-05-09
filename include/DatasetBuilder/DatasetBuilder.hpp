@@ -55,6 +55,7 @@ namespace DatasetBuilder
 
         bool m_outputFolderSelected = false;
         std::string m_outputFolder;
+        fs::path m_transcriptionPath;
     };
 
 }
