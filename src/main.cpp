@@ -1,11 +1,11 @@
 #include <QApplication>
 
-#include <DatasetBuilder/MainWindow.hpp>
+#include <DatasetBuilder/DatasetBuilder.hpp>
 
 int main(int argc, char** argv)
 {
     QApplication app {argc, argv};
-    DatasetBuilder::MainWindow window;
+    DatasetBuilder::DatasetBuilder window;
     window.show();
 
     return app.exec();

@@ -16,7 +16,7 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(thirdparty/json)
 
 set(HEADERS
-        "include/DatasetBuilder/MainWindow.hpp"
+        "include/DatasetBuilder/DatasetBuilder.hpp"
         "include/DatasetBuilder/DatasetImage.hpp"
         "include/DatasetBuilder/ImageSet.hpp"
         "include/DatasetBuilder/ImageSegmenterDialog.hpp"
@@ -30,7 +30,7 @@ set(HEADERS
 
 set(SOURCES
         "src/main.cpp"
-        "src/DatasetBuilder/MainWindow.cpp"
+        "src/DatasetBuilder/DatasetBuilder.cpp"
         "src/DatasetBuilder/DatasetImage.cpp"
         "src/DatasetBuilder/ImageSet.cpp"
         "src/DatasetBuilder/ImageSegmenterDialog.cpp"
@@ -42,7 +42,7 @@ set(SOURCES
         )
 
 set(UI
-        "src/DatasetBuilder/MainWindow.ui"
+        "src/DatasetBuilder/DatasetBuilder.ui"
         "src/DatasetBuilder/ImageSegmenterDialog.ui"
         )
 
