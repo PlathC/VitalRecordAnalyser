@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 class TextSegmentation
 {
 public:
-    TextSegmentation(const std::string& src, const std::string& out);
+    TextSegmentation(const std::string& src);
 
     TextSegmentation(const TextSegmentation&) = delete;
     TextSegmentation& operator=(const TextSegmentation&) = delete;
@@ -50,11 +50,6 @@ private:
 
     static constexpr uint16_t MinArea = 44000;
     cv::Mat m_src;
-    std::string m_outputPath;
-    std::string m_name;
-    std::string m_extension;
-
-    fs::path m_wordsPath;
 };
 
 #endif //CIVILREGISTRYANALYSER_TEXTSEGMENTATION_HPP

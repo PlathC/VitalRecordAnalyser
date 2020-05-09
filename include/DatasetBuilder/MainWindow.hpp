@@ -55,8 +55,6 @@ namespace DatasetBuilder
 
         bool m_outputFolderSelected = false;
         std::string m_outputFolder;
-
-        uint32_t m_imgCount = 0;
     };
 
 }

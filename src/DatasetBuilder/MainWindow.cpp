@@ -70,7 +70,7 @@ namespace DatasetBuilder
         ui->m_lwRemainingFolders->clear();
         for(const auto& set : m_sets)
         {
-            ui->m_lwRemainingFolders->addItem(QString::fromStdString(set.FolderPath()));
+            ui->m_lwRemainingFolders->addItem(QString::fromStdString(set.SourceImage().string()));
         }
     }
 
@@ -86,16 +86,17 @@ namespace DatasetBuilder
             QStringList files = dialog->selectedFiles();
             for(const auto& file : files)
             {
-                ImageSegmenterDialog* segmenterDialog = new ImageSegmenterDialog(file, QString::fromStdString(m_outputFolder), this);
+                auto* segmenterDialog = new ImageSegmenterDialog(file, QString::fromStdString(m_outputFolder), this);
 
                 if(segmenterDialog->exec())
                 {
                     auto images = segmenterDialog->GetImages();
                     if(!images.empty())
-                        m_sets.emplace_back(images, m_outputFolder);
+                    {
+                        m_sets.emplace_back(file.toStdString(), images, m_outputFolder);
+                    }
+
                 }
-                //m_sets.emplace_back(DatasetBuilder::ImageSet(file.toStdString(), m_outputFolder));
-                //QMessageBox::information(this, "Success", "File " + file + " extracted !");
             }
 
             if(!m_currentImg)
@@ -142,7 +143,6 @@ namespace DatasetBuilder
 
     void MainWindow::Save()
     {
-        m_currentImg->Name(std::to_string(m_imgCount++));
         m_currentImg->Text(ui->m_leTextImg->text().toStdString());
         NextImage(true);
     }

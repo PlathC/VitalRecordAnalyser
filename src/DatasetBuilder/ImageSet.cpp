@@ -9,14 +9,11 @@ namespace DatasetBuilder{
             ".jpg", ".jpeg", ".png"
     };
 
-    ImageSet::ImageSet(const std::string& m_path, const std::string& outputFolder) :
-        m_folderPath(m_path),
+    ImageSet::ImageSet(const std::string& path, const std::string& outputFolder) :
+        m_inputPath(path),
         m_outputFolder(outputFolder)
     {
-        std::string workingDir = m_outputFolder + "/temp";
-        fs::create_directory(workingDir);
-
-        fs::path file {m_path};
+        fs::path file {m_inputPath};
         if(file.has_filename())
         {
             bool isFileSupported = std::find(
@@ -26,7 +23,8 @@ namespace DatasetBuilder{
                             != SupportedImageFiles.end();
             if(isFileSupported)
             {
-                TextSegmentation segmentor = TextSegmentation(file.string(), workingDir);
+                m_src = cv::imread(file.string());
+                TextSegmentation segmentor = TextSegmentation(file.string());
                 std::vector<cv::Mat> imageList;// = segmentor.Process();
                 for(const auto& image : imageList)
                 {
@@ -36,7 +34,8 @@ namespace DatasetBuilder{
         }
     }
 
-    ImageSet::ImageSet(const std::vector<cv::Mat>& images, const std::string& outputFolder):
+    ImageSet::ImageSet(const std::string& path, const std::vector<cv::Mat>& images, const std::string& outputFolder):
+            m_inputPath(path),
             m_outputFolder(outputFolder)
     {
         for(const auto& img: images)
@@ -55,16 +54,24 @@ namespace DatasetBuilder{
         auto& top = m_images.top();
         if(save)
         {
-            top.Save(m_outputFolder);
+            if(!m_srcSaved)
+            {
+                cv::imwrite(m_outputFolder + m_inputPath.filename().string() + ".png", m_src);
+                fs::create_directory(m_outputFolder + '/' + m_inputPath.filename().string());
+                m_srcSaved = true;
+            }
+
+            top.Name(std::to_string(m_imgCount++));
+            top.Save(m_outputFolder + m_inputPath.filename().string());
         }
         m_images.pop();
 
         return m_images.size();
     }
 
-    const std::string& ImageSet::FolderPath() const
+    const fs::path& ImageSet::SourceImage() const
     {
-        return m_folderPath;
+        return m_inputPath;
     }
 
     const std::string& ImageSet::OutputFolder() const

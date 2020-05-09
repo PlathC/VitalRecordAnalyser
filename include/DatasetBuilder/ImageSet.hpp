@@ -7,10 +7,13 @@
 
 #include <stack>
 #include <string>
+#include <filesystem>
 
 #include "TextSegmentation/TextSegmentation.hpp"
 
 #include "DatasetBuilder/DatasetImage.hpp"
+
+namespace fs = std::filesystem;
 
 namespace DatasetBuilder
 {
@@ -18,20 +21,23 @@ namespace DatasetBuilder
     {
     public:
         explicit ImageSet(const std::string& path, const std::string& outputFolder = "");
-        explicit ImageSet(const std::vector<cv::Mat>& images, const std::string& outputFolder = "");
+        explicit ImageSet(const std::string& path, const std::vector<cv::Mat>& images, const std::string& outputFolder = "");
 
         DatasetImage& CurrentImage();
         int Skip(bool save);
 
-        [[nodiscard]] const std::string& FolderPath() const;
+        [[nodiscard]] const fs::path& SourceImage() const;
         [[nodiscard]] const std::string& ImageSet::OutputFolder() const;
         void SetOutputFolder(const std::string& folder);
     private:
         static const std::array<std::string, 3> SupportedImageFiles;
 
-        std::string m_folderPath;
+        fs::path m_inputPath;
         std::string m_outputFolder;
         std::stack<DatasetImage> m_images;
+        cv::Mat m_src;
+        bool m_srcSaved = false;
+        uint16_t m_imgCount = 0;
     };
 }
 

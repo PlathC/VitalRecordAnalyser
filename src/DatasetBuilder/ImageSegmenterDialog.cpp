@@ -18,8 +18,6 @@ namespace DatasetBuilder
             m_path(imgPath.toStdString())
     {
         ui->setupUi(this);
-        std::string workingDir = m_outputFolder + "/temp";
-        fs::create_directory(workingDir);
 
         fs::path file {m_path};
         if(file.has_filename())
@@ -36,7 +34,7 @@ namespace DatasetBuilder
             else
             {
                 ui->m_buttonBox->setDisabled(true);
-                segmentor = std::make_unique<TextSegmentation>(file.string(), workingDir);
+                segmentor = std::make_unique<TextSegmentation>(file.string());
 
                 m_progressTimer = new QTimer(this);
                 ui->m_pbTask->setValue(0);
@@ -60,6 +58,7 @@ namespace DatasetBuilder
             m_images = segmentor->GetExtractedWords();
             m_progressTimer->stop();
             ui->m_buttonBox->setDisabled(false);
+            ui->m_lblTaskInformation->setText("Task done !");
         }
         else
         {

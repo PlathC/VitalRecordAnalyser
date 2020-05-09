@@ -4,27 +4,14 @@
 
 #include "include/TextSegmentation/TextSegmentation.hpp"
 
-TextSegmentation::TextSegmentation(const std::string& src, const std::string& out) :
-    m_src(cv::imread(src)),
-    m_outputPath(out)
+TextSegmentation::TextSegmentation(const std::string& src) :
+    m_src(cv::imread(src))
 {
-    m_name = m_outputPath.substr(m_outputPath.find_last_of("/\\") + 1);
-    m_name = m_name.substr(0, m_name.find("."));
-
-    m_extension = ".png";
-    m_wordsPath = m_outputPath;
-    m_wordsPath /= "words";
-
-    fs::create_directories(m_outputPath);
 }
 
 TextSegmentation::TextSegmentation(TextSegmentation&& oldTextSegmentation) noexcept:
         m_progress(oldTextSegmentation.m_progress),
         m_src(oldTextSegmentation.m_src),
-        m_outputPath(oldTextSegmentation.m_outputPath),
-        m_name(oldTextSegmentation.m_name),
-        m_extension(oldTextSegmentation.m_extension),
-        m_wordsPath(oldTextSegmentation.m_wordsPath),
         m_thread(std::move(oldTextSegmentation.m_thread))
 {
 }
@@ -33,10 +20,6 @@ TextSegmentation& TextSegmentation::operator=(TextSegmentation&& oldTextSegmenta
 {
     m_progress = oldTextSegmentation.m_progress;
     m_src = oldTextSegmentation.m_src;
-    m_outputPath = oldTextSegmentation.m_outputPath;
-    m_name = oldTextSegmentation.m_name;
-    m_extension = oldTextSegmentation.m_extension;
-    m_wordsPath = oldTextSegmentation.m_wordsPath;
 
     m_thread = std::move(oldTextSegmentation.m_thread);
     return *this;
@@ -75,7 +58,6 @@ void TextSegmentation::Process()
     cv::Mat edges;
     cv::Canny(blurred, edges, 0, 200);
     cv::threshold(edges, edges, 220, 255, cv::ThresholdTypes::THRESH_BINARY);
-    cv::imwrite(m_outputPath + "/" + "threshold.png", edges);
 
     int kernelSize = 2;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT,
@@ -100,8 +82,6 @@ void TextSegmentation::Process()
     for(int i = 0; i < contours.size(); i++)
         cv::drawContours( fullContourImg, contours, i, cv::Scalar(0, 0, 0), 2, 8, hierarchy, 0, cv::Point() );
 
-    cv::imwrite(m_outputPath + "/" + "FULLCONTOUR.png", fullContourImg);
-
     cv::Mat contourImg;
     m_src.copyTo(contourImg);
     std::vector<cv::Mat> detectedArea;
@@ -122,7 +102,6 @@ void TextSegmentation::Process()
                 cv::Scalar(0, 255, 0), 4),
         detectedArea.push_back(out);
     }
-    cv::imwrite(m_outputPath + "/" + "CONTOURS.png", contourImg);
 
     m_progressLocker.lock();
     m_progress = 20;
@@ -131,17 +110,13 @@ void TextSegmentation::Process()
     int i = 0;
     detectedArea.erase(std::remove_if(detectedArea.begin(), detectedArea.end(), [](const auto& img ) -> bool
     {
-        return img.cols*2 < img.rows;
+        return (img.cols * 2) < img.rows;
     }), detectedArea.end());
 
 
     uint8_t step = 80 / detectedArea.size();
     for(const auto& img : detectedArea)
     {
-        cv::imwrite(m_outputPath + "/" + std::to_string(i) + ".png", img);
-        std::cout << "Writing into " + m_outputPath + "/" << std::endl;
-        std::cout << std::to_string(i++) << "/" << detectedArea.size() << std::endl;
-
         std::vector<cv::Mat> extracted = ExtractWords(img);
 
         detectedWords.insert(detectedWords.begin(), extracted.begin(), extracted.end());
@@ -154,7 +129,6 @@ void TextSegmentation::Process()
     m_processedImages.insert(m_processedImages.begin(), detectedWords.begin(), detectedWords.end());
     std::lock_guard lockProgress{m_progressLocker};
     m_progress = 100;
-    //return detectedWords;
 }
 
 std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
@@ -163,13 +137,7 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
     std::unique_ptr<Scanner> scanner = std::make_unique<Scanner>();
     cv::Mat imageCropped;
     scanner->process(src, imageCropped);
-
-    fs::path saveCrop = m_outputPath;
-    std::string cropName = m_name + "_1_crop" + m_extension;
-    saveCrop /= cropName;
-    cv::imwrite(saveCrop.u8string(), imageCropped);
     // END Step 1 //
-
 
     // START Step 1.1: resize and definitions //
     int newW = 1280;
@@ -180,39 +148,26 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
     int chunksProcess = 4;
     // END Step 1.1 //
 
-
     // START Step 2: binarization //
     std::unique_ptr<Binarization> threshold = std::make_unique<Binarization>();
     cv::Mat imageBinary;
+
     // default = 0 | otsu = 1 | niblack = 2 | sauvola = 3 | wolf = 4 //
     threshold->binarize(imageCropped, imageBinary, false, 0);
-
-    fs::path saveBinary = m_outputPath;
-    std::string binaryName = m_name + "_2_binary" + m_extension;
-    saveBinary /= binaryName;
-    cv::imwrite(saveBinary.u8string(), imageBinary);
     // END Step 2 //
-
 
     // START Step 3: line segmentation //
     std::unique_ptr<LineSegmentation> line = std::make_unique<LineSegmentation>();
     std::vector<cv::Mat> lines;
     cv::Mat imageLines = imageBinary.clone();
     line->segment(imageLines, lines, chunksNumber, chunksProcess);
-
-    fs::path saveLines = m_outputPath;
-    std::string linesName = m_name + "_3_lines" + m_extension;
-    saveLines /= linesName;
-    cv::imwrite(saveLines.u8string(), imageLines);
     // END Step 3 //
-
 
     // START Step 4: word segmentation //
     std::unique_ptr<WordSegmentation> word = std::make_unique<WordSegmentation>();
     std::vector<cv::Mat> summary;
     std::vector<cv::Mat> wordsSave;
     word->setKernel(11, 5, 1);
-
 
     for (int i=0; i<lines.size(); i++) {
         std::string lineIndex = std::to_string((i+1)*1e-6).substr(5);
@@ -228,14 +183,9 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
             return img.cols < 100;
         }), words.end());
 
-        fs::create_directories(m_wordsPath);
-        for (int j=0; j<words.size(); j++)
-        {
-            std::string wordIndex = lineIndex + "_" + std::to_string((j + 1) * 1e-6).substr(5);
-            fs::path saveWord = m_wordsPath / (wordIndex + m_extension);
-            cv::imwrite(saveWord.u8string(), words[j]);
-            wordsSave.push_back(words[j]);
-        }
+        for (const auto & currentWord : words)
+            wordsSave.push_back(currentWord);
+
     }
 
     return wordsSave;
