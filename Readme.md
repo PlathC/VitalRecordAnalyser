@@ -11,8 +11,9 @@ algorithms.
 - Qt (Tested with >= 5.11.2)
 - [Nlohmann Json](https://github.com/nlohmann/json.git)
 
-### Build
+### Clone and  Build
 
 ```
+git clone --recurse-submodules -j8 https://github.com/PlathC/CivilRegistryAnalyser.git
 cmake --build .
 ```
