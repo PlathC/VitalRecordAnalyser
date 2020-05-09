@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>DatasetBuilder</class>
+ <widget class="QMainWindow" name="DatasetBuilder">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -138,7 +138,7 @@
   <connection>
    <sender>m_pbSkip</sender>
    <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>DatasetBuilder</receiver>
    <slot>SkipCurrentImage()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -154,7 +154,7 @@
   <connection>
    <sender>m_pbSave</sender>
    <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>DatasetBuilder</receiver>
    <slot>Save()</slot>
    <hints>
     <hint type="sourcelabel">

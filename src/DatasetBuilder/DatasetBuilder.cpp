@@ -2,14 +2,14 @@
 // Created by Platholl on 06/05/2020.
 //
 
-#include "DatasetBuilder/MainWindow.hpp"
-#include "ui_MainWindow.h"
+#include "DatasetBuilder/DatasetBuilder.hpp"
+#include "ui_DatasetBuilder.h"
 
 namespace DatasetBuilder
 {
-    MainWindow::MainWindow(QWidget *parent) :
+    DatasetBuilder::DatasetBuilder(QWidget *parent) :
             QMainWindow(parent),
-            ui(new Ui::MainWindow)
+            ui(new Ui::DatasetBuilder)
     {
         ui->setupUi(this);
         QObject::connect(ui->m_acInputFolders,
@@ -23,7 +23,7 @@ namespace DatasetBuilder
         );
     }
 
-    void MainWindow::UpdateUi()
+    void DatasetBuilder::UpdateUi()
     {
         if(m_currentImg)
         {
@@ -74,7 +74,7 @@ namespace DatasetBuilder
         }
     }
 
-    void MainWindow::SelectInputFolders()
+    void DatasetBuilder::SelectInputFolders()
     {
         auto* dialog = new QFileDialog(this);
 
@@ -95,7 +95,6 @@ namespace DatasetBuilder
                     {
                         m_sets.emplace_back(file.toStdString(), images, m_outputFolder);
                     }
-
                 }
             }
 
@@ -126,7 +125,7 @@ namespace DatasetBuilder
         }
     }
 
-    void MainWindow::SelectOutputFolder()
+    void DatasetBuilder::SelectOutputFolder()
     {
         auto* dialog = new QFileDialog(this);
         dialog->setFileMode(QFileDialog::DirectoryOnly);
@@ -149,19 +148,19 @@ namespace DatasetBuilder
         }
     }
 
-    void MainWindow::SkipCurrentImage()
+    void DatasetBuilder::SkipCurrentImage()
     {
         NextImage(false);
     }
 
-    void MainWindow::Save()
+    void DatasetBuilder::Save()
     {
         m_currentImg->Text(ui->m_leTextImg->text().toStdString());
         NextImage(true);
         ui->m_leTextImg->clear();
     }
 
-    void MainWindow::keyPressEvent(QKeyEvent *event)
+    void DatasetBuilder::keyPressEvent(QKeyEvent *event)
     {
         if( event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
         {
@@ -176,7 +175,7 @@ namespace DatasetBuilder
         }
     }
 
-    void MainWindow::NextImage(bool save)
+    void DatasetBuilder::NextImage(bool save)
     {
         if(m_currentSet)
         {
@@ -204,7 +203,7 @@ namespace DatasetBuilder
         }
     }
 
-    MainWindow::~MainWindow()
+    DatasetBuilder::~DatasetBuilder()
     {
         delete ui;
     }
