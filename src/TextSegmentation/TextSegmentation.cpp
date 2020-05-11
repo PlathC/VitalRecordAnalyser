@@ -151,6 +151,7 @@ std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
     // START Step 2: binarization //
     std::unique_ptr<Binarization> threshold = std::make_unique<Binarization>();
     cv::Mat imageBinary;
+    cv::cvtColor(src, imageBinary, cv::COLOR_BGR2GRAY);
 
     // default = 0 | otsu = 1 | niblack = 2 | sauvola = 3 | wolf = 4 //
     threshold->binarize(imageCropped, imageBinary, false, 0);

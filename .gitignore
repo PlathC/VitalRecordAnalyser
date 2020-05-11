@@ -14,7 +14,7 @@
 *.dylib
 *.dll
 
-# Fortran module files
+# Fortran cmake files
 *.mod
 
 # Compiled Static libraries
