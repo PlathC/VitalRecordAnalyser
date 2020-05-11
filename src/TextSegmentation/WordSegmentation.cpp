@@ -29,7 +29,10 @@ void WordSegmentation::processBounds(cv::Mat &image, std::vector<cv::Rect> &boun
             cv::rectangle(edged, r.tl(), r.br(), 255, 2, 8, 0);
         }
 
-        printContours(edged, contours, hierarchy, 0);
+        if(!hierarchy.empty())
+            printContours(edged, contours, hierarchy, 0);
+        else
+            std::cout << "EMPTY " << std::endl;
         image = edged;
 
         if (contours.size() == lastNumber) break;
@@ -41,22 +44,25 @@ void WordSegmentation::processBounds(cv::Mat &image, std::vector<cv::Rect> &boun
     sort(boundRect.begin(), boundRect.end(), compareXCords);
 
     int i=0;
-    while (i<boundRect.size()-1){
-        if (boundRect[i].tl().x <= boundRect[i+1].tl().x &&
-            boundRect[i].br().x >= boundRect[i+1].br().x
-                ){
-            int minX = std::min(boundRect[i].tl().x, boundRect[i+1].tl().x);
-            int minY = std::min(boundRect[i].tl().y, boundRect[i+1].tl().y);
-            int maxY = std::max(boundRect[i].br().y, boundRect[i+1].br().y);
+    if(!boundRect.empty())
+    {
+        while (i<boundRect.size()-1){
+            if (boundRect[i].tl().x <= boundRect[i+1].tl().x &&
+                boundRect[i].br().x >= boundRect[i+1].br().x
+                    ){
+                int minX = std::min(boundRect[i].tl().x, boundRect[i+1].tl().x);
+                int minY = std::min(boundRect[i].tl().y, boundRect[i+1].tl().y);
+                int maxY = std::max(boundRect[i].br().y, boundRect[i+1].br().y);
 
-            int width = std::max(boundRect[i].width, boundRect[i + 1].width);
-            int height = std::abs(minY - maxY);
+                int width = std::max(boundRect[i].width, boundRect[i + 1].width);
+                int height = std::abs(minY - maxY);
 
-            boundRect[i+1] = cv::Rect(minX, minY, width, height);
-            boundRect.erase(boundRect.begin() + i);
-            continue;
+                boundRect[i+1] = cv::Rect(minX, minY, width, height);
+                boundRect.erase(boundRect.begin() + i);
+                continue;
+            }
+            ++i;
         }
-        ++i;
     }
 }
 
