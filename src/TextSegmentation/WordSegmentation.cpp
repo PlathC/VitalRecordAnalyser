@@ -31,8 +31,7 @@ void WordSegmentation::processBounds(cv::Mat &image, std::vector<cv::Rect> &boun
 
         if(!hierarchy.empty())
             printContours(edged, contours, hierarchy, 0);
-        else
-            std::cout << "EMPTY " << std::endl;
+
         image = edged;
 
         if (contours.size() == lastNumber) break;
