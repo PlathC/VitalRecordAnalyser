@@ -9,7 +9,6 @@ algorithms.
 
 - OpenCv (Tested with >= 4.0.1)
 - Qt (Tested with >= 5.11.2)
-- [Nlohmann Json](https://github.com/nlohmann/json.git)
 
 ### Clone and  Build
 
