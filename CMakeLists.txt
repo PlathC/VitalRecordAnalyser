@@ -15,19 +15,9 @@ find_package(OpenCV REQUIRED)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(thirdparty/json)
 
-message("VAL ==> $ENV{TENSORFLOW_BUILD_DIR}")
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
-#set(TF_INCLUDE
-#        "D:\\Library\\tensorflow\\bazel-tensorflow"
-#        "D:\\Library\\tensorflow\\bazel-tensorflow\\external\\com_google_absl"
-#        "D:\\Library\\tensorflow\\bazel-tensorflow\\external\\eigen_archive"
-#        "D:\\Library\\tensorflow\\bazel-tensorflow\\external\\com_google_protobuf\\src"
-#        "D:\\Library\\tensorflow\\bazel-bin"
-#        )
-#set(TF_LIBRARY "D:\\Library\\tensorflow\\bazel-bin\\tensorflow\\tensorflow.lib")
-
-find_package(Tensorflow REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 set(HEADERS
         "include/DatasetBuilder/DatasetBuilder.hpp"
@@ -79,7 +69,9 @@ endif ()
 
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(tftest SYSTEM PRIVATE ${TensorFlow_INCLUDE_DIR})
+target_include_directories(tftest PUBLIC SYSTEM PRIVATE thirdparty)
+target_link_libraries(tftest PRIVATE Eigen3::Eigen)
+target_link_libraries(tftest PRIVATE nlohmann_json::nlohmann_json)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets
@@ -87,4 +79,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
-target_link_libraries(tftest ${TensorFlow_LIBRARY})
+
+#target_link_libraries(frugally-deep_LIBRARY ${TensorFlow_LIBRARY})
