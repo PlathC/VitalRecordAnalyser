@@ -69,15 +69,14 @@ endif ()
 
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(tftest PUBLIC SYSTEM PRIVATE thirdparty)
+target_include_directories(tftest SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_include_directories(tftest SYSTEM PRIVATE thirdparty)
+
 target_link_libraries(tftest PRIVATE Eigen3::Eigen)
 target_link_libraries(tftest PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(tftest PRIVATE ${OpenCV_LIBS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets
-        ${OpenCV_LIBS} )
-
-target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
-
-
-#target_link_libraries(frugally-deep_LIBRARY ${TensorFlow_LIBRARY})
+        ${OpenCV_LIBS}
+        nlohmann_json::nlohmann_json)
