@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 
 #include <pybind11/pybind11.h>
@@ -132,7 +133,20 @@ PYBIND11_TYPE_CASTER(cv::Mat, _("numpy.ndarray"));
 int main()
 {
     py::scoped_interpreter guard{};
-    py::module sys = py::module::import("tensorflow");
+    py::module tf = py::module::import("tensorflow");
+    try
+    {
+        py::module textDetection = py::module::import("text_detection");
+        cv::Mat src = cv::imread("Germaine.png", cv::IMREAD_GRAYSCALE);
+        textDetection.attr("read_text_from_image")(src);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 
-    return 0;
+    //py::object result = textDetection.attr("read_text_from_image")();
+    //std::string output = result.cast<std::string>();
+
+    return EXIT_SUCCESS;
 }
