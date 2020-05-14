@@ -15,9 +15,11 @@ find_package(OpenCV REQUIRED)
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(thirdparty/json)
 
+add_subdirectory(thirdparty/pybind11)
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+execute_process(COMMAND "conda activate HandWrittenTextRecognitionTutorial")
 
 set(HEADERS
         "include/DatasetBuilder/DatasetBuilder.hpp"
@@ -61,19 +63,13 @@ elseif (MSVC)
     else()
         target_compile_options(${PROJECT_NAME} PRIVATE /std:c++17 /Zc:__cplusplus /DNDEBUG /O2 /Ob2 /EHsc /Zi /wd4996 /wd4634 /wd4635)
     endif()
-
-    if(MARIONETTE_DYNAMIC)
-            target_compile_definitions(${PROJECT_NAME} PRIVATE MARIONETTE_DYNAMIC)
-    endif()
 endif ()
 
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(tftest SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS})
-target_include_directories(tftest SYSTEM PRIVATE thirdparty)
+target_link_libraries(tftest PRIVATE pybind11::embed)
 
-target_link_libraries(tftest PRIVATE Eigen3::Eigen)
-target_link_libraries(tftest PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(tftest PRIVATE ${OpenCV_LIBS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
