@@ -1,6 +1,8 @@
 // main.cpp
 #define FDEEP_FLOAT_TYPE double
 
+#include <algorithm>
+
 #include <fdeep/fdeep.hpp>
 #include <opencv2/opencv.hpp>
 
@@ -15,36 +17,42 @@ namespace fdeep {
                                      const float_vec &weights, const float_vec &bias)
                     : conv_2d_layer(name, filter_shape, k, strides,
                                     p, dilation_rate, weights, bias),
-                      m_nbFilters(nb_filters) {
+                      m_nbFilters(nb_filters)
+            {
 
             }
 
         protected:
-            tensors apply_impl(const tensors &input) const override {
+            tensors apply_impl(const tensors &input) const override
+            {
                 tensors temp = conv_2d_layer::apply_impl(input);
                 auto linear = std::make_shared<linear_layer>("linear");
                 auto sigmoid = std::make_shared<sigmoid_layer>("sigmoid");
-
                 const auto &tempInput = single_tensor_from_tensors(temp);
 
+                tensor_shape nShape(tempInput.shape().height_, tempInput.shape().width_, tempInput.shape().depth_/2);
 
-                tensor output(tempInput.shape(), 0);
-                for (std::size_t dim5 = 0; dim5 < output.shape().size_dim_5_;
-                ++dim5)
+                tensor sigmoidOutput(nShape, 0);
+                tensor linearOutput(nShape, 0);
+                for (std::size_t dim5 = 0; dim5 < tempInput.shape().size_dim_5_; ++dim5)
                 {
-                    for (std::size_t dim4 = 0; dim4 < output.shape().size_dim_4_; ++dim4) {
-                        for (std::size_t z = 0; z < output.shape().depth_; ++z) {
-                            for (std::size_t y = 0; y < output.shape().height_; ++y) {
-                                for (std::size_t x = 0; x < output.shape().width_; ++x)
+                    for (std::size_t dim4 = 0; dim4 < tempInput.shape().size_dim_4_; ++dim4)
+                    {
+                        for (std::size_t x = 0; x < tempInput.shape().height_; ++x)
+                        {
+                            for (std::size_t y = 0; y < tempInput.shape().width_; ++y)
+                            {
+                                for (std::size_t z = 0; z < tempInput.shape().depth_; ++z)
                                 {
-                                    float_type val = tempInput.get(tensor_pos(dim5, dim4, y, x, z));
-                                    if (y > m_nbFilters || x > m_nbFilters)
+                                    float_type val = tempInput.get(tensor_pos(y, x, z));
+
+                                    if (z > tempInput.shape().depth_ / 2 - 1)
                                     {
-                                        output.set_ignore_rank(tensor_pos(dim5, dim4, y, x, z), val);
+                                        sigmoidOutput.set(tensor_pos(y, x, z), val);
                                     }
                                     else
                                     {
-                                        output.set(tensor_pos(dim5, dim4, y, x, z), val);
+                                        linearOutput.set(tensor_pos(y, x, z), val);
                                     }
                                 }
                             }
@@ -52,8 +60,8 @@ namespace fdeep {
                     }
                 }
 
-                auto linearValue = apply_activation_layer(linear, {output});
-                auto sigmoidValue = apply_activation_layer(sigmoid, {output});
+                auto linearValue = apply_activation_layer(linear, {linearOutput});
+                auto sigmoidValue = apply_activation_layer(sigmoid, {sigmoidOutput});
                 std::vector<tensor> toMultiply;
                 toMultiply.insert(toMultiply.end(), linearValue.begin(), linearValue.end());
                 toMultiply.insert(toMultiply.end(), sigmoidValue.begin(), sigmoidValue.end());
@@ -100,6 +108,24 @@ namespace fdeep {
 int main() {
     const cv::Mat image = cv::imread("Germaine.png");
     cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+    cv::Mat gray;
+    cv::cvtColor(image, gray, cv::COLOR_RGB2GRAY);
+    const double WishingWidth  = 1024.;
+    const double WishingHeight = 128.;
+    const double CurrentWidth  = static_cast<double>(gray.size().width);
+    const double CurrentHeight = static_cast<double>(gray.size().height);
+
+    double f = std::max((CurrentWidth / WishingWidth),
+                          (CurrentHeight / WishingHeight));
+
+    double divW = std::floor(CurrentWidth / f);
+    double minWidth = std::min(WishingWidth, divW);
+    double newWidth = std::max(minWidth, 1.);
+
+    double divH = static_cast<double>(std::floor(CurrentHeight / f));
+    double minHeight = std::min(WishingHeight, std::floor(CurrentHeight / f));
+    double newHeight = std::max(minHeight, 1.);
+    cv::resize(gray, gray, cv::Size(1024, 128));
     assert(image.isContinuous());
 
     try {
@@ -108,25 +134,26 @@ int main() {
         };
 
         const auto model =
-                fdeep::load_model("./model.json", true,
-                                  fdeep::cout_logger, static_cast<fdeep::float_type>(0.01),
+                fdeep::load_model("./modelunopti.json", true,
+                                  fdeep::cout_logger, static_cast<fdeep::float_type>(1),
                                   creators);
 
-        const auto input = fdeep::tensor_from_bytes(image.ptr(),
-                                                    static_cast<std::size_t>(image.rows),
-                                                    static_cast<std::size_t>(image.cols),
-                                                    static_cast<std::size_t>(image.channels()),
-                                                    0, 255);
-        std::size_t result;
+        const auto input = fdeep::tensor_from_bytes(gray.ptr(),
+                                                    static_cast<std::size_t>(gray.cols),
+                                                    static_cast<std::size_t>(gray.rows),
+                                                    static_cast<std::size_t>(gray.channels()),
+                                                    0, 1);
         try {
-            result = model.predict_class({input});
+            const auto result = model.predict({input});
+            std::cout << fdeep::show_tensors(result) << std::endl;
+
         }
         catch (std::exception &e) {
             std::cerr << e.what() << std::endl;
-            result = 0;
         }
-        std::cout << result << std::endl;
-    } catch (std::exception &e) {
+    }
+    catch (std::exception &e)
+    {
         std::cerr << "Error while loading : " << e.what() << std::endl;
         return -1;
     }
