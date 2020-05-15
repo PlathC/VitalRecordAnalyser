@@ -133,6 +133,10 @@ PYBIND11_TYPE_CASTER(cv::Mat, _("numpy.ndarray"));
 int main()
 {
     py::scoped_interpreter guard{};
+    py::exec(R"(
+        import sys
+        sys.path.insert(0,'py')
+    )");
     py::module tf = py::module::import("tensorflow");
     try
     {

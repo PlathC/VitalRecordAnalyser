@@ -76,3 +76,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets
         ${OpenCV_LIBS}
         nlohmann_json::nlohmann_json)
+
+file(GLOB PYTHONFILES
+        "py/*"
+        )
+file(COPY ${PYTHONFILES} DESTINATION py)
