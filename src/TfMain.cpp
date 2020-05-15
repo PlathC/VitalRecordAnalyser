@@ -128,7 +128,7 @@ PYBIND11_TYPE_CASTER(cv::Mat, _("numpy.ndarray"));
     }
 
 };
-    }} // namespace pybind11::detail
+}} // namespace pybind11::detail
 
 int main()
 {
@@ -138,15 +138,16 @@ int main()
     {
         py::module textDetection = py::module::import("text_detection");
         cv::Mat src = cv::imread("Germaine.png", cv::IMREAD_GRAYSCALE);
-        textDetection.attr("read_text_from_image")(src);
+        py::object result = textDetection.attr("read_text_from_image")(src);
+        std::string output = result.cast<std::string>();
+
+        std::cout << "Prediction from Python : " << output << std::endl;
+
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
     }
-
-    //py::object result = textDetection.attr("read_text_from_image")();
-    //std::string output = result.cast<std::string>();
 
     return EXIT_SUCCESS;
 }

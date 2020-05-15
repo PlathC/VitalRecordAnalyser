@@ -18,18 +18,19 @@ def read_text_from_image(img):
 	max_text_length = 128
 	charset_base = string.printable[:95]
 	tokenizer = Tokenizer(chars=charset_base, max_text_length=max_text_length)
-	img = pp.preprocess(args.image, input_size=input_size)
+	img = pp.preprocess(img, input_size=input_size)
 	x_test = pp.normalization([img])
 
-	model = HTRModel(architecture=args.arch,
+	model = HTRModel(architecture="flor",
 					 input_size=input_size,
 					 vocab_size=tokenizer.vocab_size,
 					 top_paths=10)
 	
 	model.compile()
-	model.load_checkpoint(target=target_path)
-	
-	model.model.save("modelunopti.hdf5", include_optimizer=False)
+	print(os.getcwd())
+
+	print(os.path.isfile("./checkpoint_weights.hdf5"))
+	model.load_checkpoint(target="checkpoint_weights.hdf5")
 
 	predicts, probabilities = model.predict(x_test, ctc_decode=True)
 	predicts = [[tokenizer.decode(x) for x in y] for y in predicts]
