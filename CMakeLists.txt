@@ -19,7 +19,7 @@ add_subdirectory(thirdparty/pybind11)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
-execute_process(COMMAND "conda activate HandWrittenTextRecognitionTutorial")
+#execute_process(COMMAND "conda activate HandWrittenTextRecognitionTutorial")
 
 set(HEADERS
         "include/DatasetBuilder/DatasetBuilder.hpp"
@@ -32,7 +32,8 @@ set(HEADERS
         "include/TextSegmentation/Scanner.hpp"
         "include/TextSegmentation/WordSegmentation.hpp"
         "include/TextSegmentation/TextSegmentation.hpp"
-        )
+        "include/TextDetection/TextDetection.hpp"
+        include/TextDetection/MatCaster.hpp)
 
 set(SOURCES
         "src/main.cpp"
@@ -44,7 +45,9 @@ set(SOURCES
         "src/TextSegmentation/LineSegmentation.cpp"
         "src/TextSegmentation/Scanner.cpp"
         "src/TextSegmentation/WordSegmentation.cpp"
-        "src/TextSegmentation/TextSegmentation.cpp")
+        "src/TextSegmentation/TextSegmentation.cpp"
+        "src/TextDetection/TextDetection.cpp"
+        )
 
 set(UI
         "src/DatasetBuilder/DatasetBuilder.ui"
@@ -52,7 +55,6 @@ set(UI
     )
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${UI})
-add_executable(tftest "src/TfMain.cpp")
 
 target_compile_options(${PROJECT_NAME} INTERFACE)
 if (CMAKE_COMPILER_IS_GNUCC)
@@ -67,15 +69,12 @@ endif ()
 
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(tftest SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(tftest PRIVATE pybind11::embed)
-
-target_link_libraries(tftest PRIVATE ${OpenCV_LIBS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Widgets
         ${OpenCV_LIBS}
-        nlohmann_json::nlohmann_json)
+        nlohmann_json::nlohmann_json
+        pybind11::embed)
 
 file(GLOB PYTHONFILES
         "py/*"

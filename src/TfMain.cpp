@@ -146,7 +146,7 @@ int main()
         std::string output = result.cast<std::string>();
 
         std::cout << "Prediction from Python : " << output << std::endl;
-
+        
     }
     catch(const std::exception& e)
     {

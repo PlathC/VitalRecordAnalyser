@@ -35,9 +35,11 @@ def read_text_from_image(img):
 	predicts, probabilities = model.predict(x_test, ctc_decode=True)
 	predicts = [[tokenizer.decode(x) for x in y] for y in predicts]
 
-	print("\n####################################")
+	max_pred = 0
+	associated_pred = ""
 	for i, (pred, prob) in enumerate(zip(predicts, probabilities)):
-		print("\nProb.  - Predict")
-
 		for (pd, pb) in zip(pred, prob):
-			print(f"{pb:.4f} - {pd}")
+			if pb > max_pred:
+				max_pred = pb
+				associated_pred = pd
+	return associated_pred
