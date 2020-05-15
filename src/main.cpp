@@ -1,5 +1,3 @@
-#include "TextDetection/TextDetection.hpp"
-
 #include <QApplication>
 
 #include <DatasetBuilder/DatasetBuilder.hpp>
