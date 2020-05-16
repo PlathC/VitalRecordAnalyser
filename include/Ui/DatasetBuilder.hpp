@@ -18,8 +18,8 @@
 
 #include "ImageUtil.hpp"
 
-#include "DatasetBuilder/ImageSet.hpp"
-#include "DatasetBuilder/ImageSegmenterDialog.hpp"
+#include "include/Model/Dataset/ImageSet.hpp"
+#include "ImageSegmenterDialog.hpp"
 
 namespace Ui
 {

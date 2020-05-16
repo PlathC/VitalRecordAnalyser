@@ -9,9 +9,9 @@
 #include <string>
 #include <filesystem>
 
-#include "TextSegmentation/TextSegmentation.hpp"
+#include "include/Model/TextSegmentation/TextSegmentation.hpp"
 
-#include "DatasetBuilder/DatasetImage.hpp"
+#include "DatasetImage.hpp"
 
 namespace fs = std::filesystem;
 

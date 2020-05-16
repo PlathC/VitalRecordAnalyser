@@ -14,7 +14,7 @@
 #include <pybind11/embed.h>
 #include <pybind11/numpy.h>
 
-#include "TextDetection/MatCaster.hpp"
+#include "MatCaster.hpp"
 
 namespace py = pybind11;
 

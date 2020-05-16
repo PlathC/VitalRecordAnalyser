@@ -14,10 +14,10 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "TextSegmentation/Binarization.hpp"
-#include "TextSegmentation/Scanner.hpp"
-#include "TextSegmentation/LineSegmentation.hpp"
-#include "TextSegmentation/WordSegmentation.hpp"
+#include "Binarization.hpp"
+#include "Scanner.hpp"
+#include "LineSegmentation.hpp"
+#include "WordSegmentation.hpp"
 
 namespace fs = std::filesystem;
 

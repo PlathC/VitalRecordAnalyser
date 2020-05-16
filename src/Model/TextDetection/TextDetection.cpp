@@ -2,7 +2,7 @@
 // Created by Platholl on 15/05/2020.
 //
 
-#include "TextDetection/TextDetection.hpp"
+#include "Model/TextDetection/TextDetection.hpp"
 
 TextDetection::TextDetection()
 {

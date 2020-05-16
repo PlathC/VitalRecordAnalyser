@@ -1,4 +1,4 @@
-#include "TextSegmentation/Scanner.hpp"
+#include "Model/TextSegmentation/Scanner.hpp"
 
 Scanner::Scanner() {
 	this->cropped = false;

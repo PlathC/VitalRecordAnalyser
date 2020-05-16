@@ -2,7 +2,7 @@
 // Created by Platholl on 07/05/2020.
 //
 
-#include "include/TextSegmentation/TextSegmentation.hpp"
+#include "Model/TextSegmentation/TextSegmentation.hpp"
 
 TextSegmentation::TextSegmentation(const std::string& src) :
     m_src(cv::imread(src))

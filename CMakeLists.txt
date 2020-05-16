@@ -22,36 +22,36 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 #execute_process(COMMAND "conda activate HandWrittenTextRecognitionTutorial")
 
 set(HEADERS
-        "include/DatasetBuilder/DatasetBuilder.hpp"
-        "include/DatasetBuilder/DatasetImage.hpp"
-        "include/DatasetBuilder/ImageSet.hpp"
-        "include/DatasetBuilder/ImageSegmenterDialog.hpp"
-        "include/ImageUtil.hpp"
-        "include/TextSegmentation/Binarization.hpp"
-        "include/TextSegmentation/LineSegmentation.hpp"
-        "include/TextSegmentation/Scanner.hpp"
-        "include/TextSegmentation/WordSegmentation.hpp"
-        "include/TextSegmentation/TextSegmentation.hpp"
-        "include/TextDetection/TextDetection.hpp"
-        include/TextDetection/MatCaster.hpp)
+        "include/Ui/DatasetBuilder.hpp"
+        "include/Ui/ImageSegmenterDialog.hpp"
+        "include/Ui/ImageUtil.hpp"
+        "include/Model/Dataset/DatasetImage.hpp"
+        "include/Model/Dataset/ImageSet.hpp"
+        "include/Model/TextSegmentation/Binarization.hpp"
+        "include/Model/TextSegmentation/LineSegmentation.hpp"
+        "include/Model/TextSegmentation/Scanner.hpp"
+        "include/Model/TextSegmentation/WordSegmentation.hpp"
+        "include/Model/TextSegmentation/TextSegmentation.hpp"
+        "include/Model/TextDetection/TextDetection.hpp"
+        include/Model/TextDetection/MatCaster.hpp)
 
 set(SOURCES
-        "src/main.cpp"
-        "src/DatasetBuilder/DatasetBuilder.cpp"
-        "src/DatasetBuilder/DatasetImage.cpp"
-        "src/DatasetBuilder/ImageSet.cpp"
-        "src/DatasetBuilder/ImageSegmenterDialog.cpp"
-        "src/TextSegmentation/Binarization.cpp"
-        "src/TextSegmentation/LineSegmentation.cpp"
-        "src/TextSegmentation/Scanner.cpp"
-        "src/TextSegmentation/WordSegmentation.cpp"
-        "src/TextSegmentation/TextSegmentation.cpp"
-        "src/TextDetection/TextDetection.cpp"
+        "src/DatasetBuilder/main.cpp"
+        "src/Ui/DatasetBuilder.cpp"
+        "src/Ui/ImageSegmenterDialog.cpp"
+        "src/Model/Dataset/DatasetImage.cpp"
+        "src/Model/Dataset/ImageSet.cpp"
+        "src/Model/TextSegmentation/Binarization.cpp"
+        "src/Model/TextSegmentation/LineSegmentation.cpp"
+        "src/Model/TextSegmentation/Scanner.cpp"
+        "src/Model/TextSegmentation/WordSegmentation.cpp"
+        "src/Model/TextSegmentation/TextSegmentation.cpp"
+        "src/Model/TextDetection/TextDetection.cpp"
         )
 
 set(UI
-        "src/DatasetBuilder/DatasetBuilder.ui"
-        "src/DatasetBuilder/ImageSegmenterDialog.ui"
+        "src/Ui/DatasetBuilder.ui"
+        "src/Ui/ImageSegmenterDialog.ui"
     )
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${UI})

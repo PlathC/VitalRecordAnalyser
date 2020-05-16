@@ -2,7 +2,7 @@
 // Created by Platholl on 06/05/2020.
 //
 
-#include "DatasetBuilder/ImageSet.hpp"
+#include "Model/Dataset/ImageSet.hpp"
 
 namespace DatasetBuilder{
     const std::array<std::string, 3> ImageSet::SupportedImageFiles = {

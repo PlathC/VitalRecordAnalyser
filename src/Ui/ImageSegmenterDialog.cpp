@@ -2,7 +2,7 @@
 // Created by Platholl on 08/05/2020.
 //
 
-#include "DatasetBuilder/ImageSegmenterDialog.hpp"
+#include "Ui/ImageSegmenterDialog.hpp"
 #include "ui_ImageSegmenterDialog.h"
 
 namespace DatasetBuilder

@@ -11,8 +11,8 @@
 #include <QThread>
 #include <QTimer>
 
-#include "TextSegmentation/TextSegmentation.hpp"
-#include "DatasetBuilder/DatasetImage.hpp"
+#include "include/Model/TextSegmentation/TextSegmentation.hpp"
+#include "include/Model/Dataset/DatasetImage.hpp"
 
 namespace fs = std::filesystem;
 

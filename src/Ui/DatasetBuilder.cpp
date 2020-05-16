@@ -2,7 +2,7 @@
 // Created by Platholl on 06/05/2020.
 //
 
-#include "DatasetBuilder/DatasetBuilder.hpp"
+#include "Ui/DatasetBuilder.hpp"
 #include "ui_DatasetBuilder.h"
 
 namespace DatasetBuilder

@@ -2,7 +2,7 @@
 // Created by Platholl on 06/05/2020.
 //
 
-#include "DatasetBuilder/DatasetImage.hpp"
+#include "Model/Dataset/DatasetImage.hpp"
 
 #include <iostream>
 
