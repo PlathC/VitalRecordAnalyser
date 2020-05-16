@@ -11,7 +11,7 @@ algorithms.
 - Qt (Tested with >= 5.11.2)
 - Python 3
 
-You might also need CUDA if you want to use Tensorflow's GPU version.s
+You might also need CUDA if you want to use Tensorflow's GPU version.
 
 ### Clone and  Build
 
