@@ -5,14 +5,22 @@ algorithms.
 
 ## Installation
 
-### Dependency
+### Dependencies
 
 - OpenCv (Tested with >= 4.0.1)
 - Qt (Tested with >= 5.11.2)
+- Python 3
+
+You might also need CUDA if you want to use Tensorflow's GPU version.s
 
 ### Clone and  Build
 
 ```
 git clone --recurse-submodules -j8 https://github.com/PlathC/CivilRegistryAnalyser.git
+cd CivilRegistryAnalyser
+pip install -r requirements.txt
+
+mkdir build && cd build
+cmake ..
 cmake --build .
 ```
