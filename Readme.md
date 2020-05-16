@@ -24,3 +24,8 @@ mkdir build && cd build
 cmake ..
 cmake --build .
 ```
+
+### Based on
+
+- [arthurflor23 / handwritten-text-recognition](https://github.com/arthurflor23/handwritten-text-recognition)
+- [arthurflor23 / text-segmentation](https://github.com/arthurflor23/text-segmentation)
