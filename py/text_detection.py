@@ -13,33 +13,40 @@ from data.reader import Dataset
 from kaldiio import WriteHelper
 from network.model import HTRModel
 
+
+def read_all_text_from_images(imgs):
+    output = []
+    for img in imgs:
+        output.append(read_text_from_image(img))
+
+    return output
+
+
 def read_text_from_image(img):
-	input_size = (1024, 128, 1)
-	max_text_length = 128
-	charset_base = string.printable[:95]
-	tokenizer = Tokenizer(chars=charset_base, max_text_length=max_text_length)
-	img = pp.preprocess(img, input_size=input_size)
-	x_test = pp.normalization([img])
+    input_size = (1024, 128, 1)
+    max_text_length = 128
+    charset_base = string.printable[:95]
+    tokenizer = Tokenizer(chars=charset_base, max_text_length=max_text_length)
+    img = pp.preprocess(img, input_size=input_size)
+    x_test = pp.normalization([img])
 
-	model = HTRModel(architecture="flor",
-					 input_size=input_size,
-					 vocab_size=tokenizer.vocab_size,
-					 top_paths=10)
-	
-	model.compile()
-	print(os.getcwd())
+    model = HTRModel(architecture="flor",
+                     input_size=input_size,
+                     vocab_size=tokenizer.vocab_size,
+                     top_paths=10)
 
-	print(os.path.isfile("./checkpoint_weights.hdf5"))
-	model.load_checkpoint(target="checkpoint_weights.hdf5")
+    model.compile()
 
-	predicts, probabilities = model.predict(x_test, ctc_decode=True)
-	predicts = [[tokenizer.decode(x) for x in y] for y in predicts]
+    model.load_checkpoint(target="checkpoint_weights.hdf5")
 
-	max_pred = 0
-	associated_pred = ""
-	for i, (pred, prob) in enumerate(zip(predicts, probabilities)):
-		for (pd, pb) in zip(pred, prob):
-			if pb > max_pred:
-				max_pred = pb
-				associated_pred = pd
-	return associated_pred
+    predicts, probabilities = model.predict(x_test, ctc_decode=True)
+    predicts = [[tokenizer.decode(x) for x in y] for y in predicts]
+
+    max_pred = 0
+    associated_pred = ""
+    for i, (pred, prob) in enumerate(zip(predicts, probabilities)):
+        for (pd, pb) in zip(pred, prob):
+            if pb > max_pred:
+                max_pred = pb
+                associated_pred = pd
+    return associated_pred

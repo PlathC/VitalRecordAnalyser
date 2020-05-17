@@ -7,7 +7,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CRA_TARGET CivilRegistryAnalyzer)
 set(DB_TARGET DatasetBuilder)
 
-
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 # Qt files auto management
@@ -27,7 +26,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 set(DB_HEADERS
         "include/Ui/DatasetBuilder.hpp"
         "include/Ui/ImageSegmenterDialog.hpp"
-        "include/Ui/ImageUtil.hpp"
+        "include/Model/ImageUtil.hpp"
         "include/Model/Dataset/DatasetImage.hpp"
         "include/Model/Dataset/ImageSet.hpp"
         "include/Model/TextSegmentation/Binarization.hpp"
@@ -57,6 +56,8 @@ set(DB_UI
 
 set(CRA_HEADERS
         "include/Ui/CivilRegistryAnalyzer.hpp"
+        "include/Ui/ImageSegmenterDialog.hpp"
+        "include/Model/ImageUtil.hpp"
         "include/Model/TextDetection/TextDetection.hpp"
         "include/Model/TextDetection/MatCaster.hpp"
         "include/Model/TextSegmentation/Binarization.hpp"
@@ -67,8 +68,9 @@ set(CRA_HEADERS
         )
 
 set(CRA_SOURCES
-        "src/Ui/CivilRegistryAnalyzer.cpp"
         "src/CivilRegistryAnalyzer/main.cpp"
+        "src/Ui/CivilRegistryAnalyzer.cpp"
+        "src/Ui/ImageSegmenterDialog.cpp"
         "src/Model/TextDetection/TextDetection.cpp"
         "src/Model/TextSegmentation/Binarization.cpp"
         "src/Model/TextSegmentation/LineSegmentation.cpp"
@@ -78,6 +80,7 @@ set(CRA_SOURCES
         )
 
 set(CRA_UI
+        "src/Ui/ImageSegmenterDialog.ui"
         "src/Ui/CivilRegistryAnalyzer.ui"
         )
 

@@ -16,7 +16,7 @@
 #include <QMessageBox>
 #include <QTreeView>
 
-#include "ImageUtil.hpp"
+#include "include/Model/ImageUtil.hpp"
 
 #include "include/Model/Dataset/ImageSet.hpp"
 #include "ImageSegmenterDialog.hpp"
@@ -34,7 +34,7 @@ namespace DatasetBuilder
     public:
         explicit DatasetBuilder(QWidget* parent = nullptr);
         void UpdateUi();
-        void SelectInputFolders();
+        void SelectInputsImages();
         void SelectOutputFolder();
 
         ~DatasetBuilder() override;

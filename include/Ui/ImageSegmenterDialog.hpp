@@ -26,7 +26,7 @@ namespace DatasetBuilder
     {
     Q_OBJECT
     public:
-        explicit ImageSegmenterDialog(QString imgPath, QString outputPath, QWidget* parent = nullptr);
+        explicit ImageSegmenterDialog(QString imgPath, QWidget* parent = nullptr);
 
         [[nodiscard]] std::vector<cv::Mat> GetImages();
 
@@ -42,7 +42,6 @@ namespace DatasetBuilder
 
         Ui::ImageSegmenterDialog* ui;
 
-        std::string m_outputFolder;
         std::string m_path;
 
         std::vector<cv::Mat> m_images;

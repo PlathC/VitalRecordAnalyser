@@ -27,3 +27,19 @@ std::string TextDetection::Process(const cv::Mat& src)
         return "";
     }
 }
+
+std::vector<std::string> TextDetection::Process(const std::vector<cv::Mat>& srcs)
+{
+    try
+    {
+        py::object result = textDetection.attr("read_text_from_image")(srcs);
+        auto output = result.cast<std::vector<std::string>>();
+        return output;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what();
+        return {};
+    }
+}
+

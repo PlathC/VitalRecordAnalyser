@@ -23,6 +23,7 @@ class TextDetection
 public:
     TextDetection();
     std::string Process(const cv::Mat& src);
+    std::vector<std::string> Process(const std::vector<cv::Mat>& srcs);
 
 private:
     py::scoped_interpreter guard{};

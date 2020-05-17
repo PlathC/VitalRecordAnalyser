@@ -14,7 +14,7 @@ namespace DatasetBuilder
         ui->setupUi(this);
         QObject::connect(ui->m_acInputFolders,
                 &QAction::triggered,
-                [&](){ SelectInputFolders(); }
+                [&](){ SelectInputsImages(); }
                 );
 
         QObject::connect(ui->m_acOutputFolder,
@@ -75,7 +75,7 @@ namespace DatasetBuilder
         }
     }
 
-    void DatasetBuilder::SelectInputFolders()
+    void DatasetBuilder::SelectInputsImages()
     {
         auto* dialog = new QFileDialog(this);
 
@@ -87,7 +87,7 @@ namespace DatasetBuilder
             QStringList files = dialog->selectedFiles();
             for(const auto& file : files)
             {
-                auto* segmenterDialog = new ImageSegmenterDialog(file, QString::fromStdString(m_outputFolder), this);
+                auto* segmenterDialog = new ImageSegmenterDialog(file, this);
 
                 if(segmenterDialog->exec())
                 {

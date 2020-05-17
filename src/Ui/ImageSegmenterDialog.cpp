@@ -11,10 +11,9 @@ namespace DatasetBuilder
             ".jpg", ".jpeg", ".png"
     };
 
-    ImageSegmenterDialog::ImageSegmenterDialog(QString imgPath, QString outputPath, QWidget* parent):
+    ImageSegmenterDialog::ImageSegmenterDialog(QString imgPath, QWidget* parent):
             QDialog(parent),
             ui(new Ui::ImageSegmenterDialog),
-            m_outputFolder(outputPath.toStdString()),
             m_path(imgPath.toStdString())
     {
         ui->setupUi(this);
