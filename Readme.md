@@ -12,6 +12,8 @@ algorithms.
   -  Shortcut (Enter to validate translation, Escape to skip the current image)
 - Provide JSON file containing translated text and segmented fragment into the selected folder
 
+![DatasetBuilder](images/scDatasetBuilder.png)
+
 ### CivilRegistryAnalyser
 
 - Auto segmentation of a text sample image
