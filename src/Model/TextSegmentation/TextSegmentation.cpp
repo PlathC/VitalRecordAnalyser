@@ -125,6 +125,8 @@ void TextSegmentation::Process()
         m_progress += step;
     }
 
+    std::reverse(std::begin(detectedWords), std::end(detectedWords));
+
     std::lock_guard lockImg{m_imagesLock};
     m_processedImages.insert(m_processedImages.begin(), detectedWords.begin(), detectedWords.end());
     std::lock_guard lockProgress{m_progressLocker};
