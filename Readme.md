@@ -23,7 +23,7 @@ algorithms.
 
 - OpenCv (Tested with >= 4.0.1)
 - Qt (Tested with >= 5.11.2)
-- Python 3
+- Python 3 (You need to provide PYTHONHOME environment variable)
 
 You might also need CUDA if you want to use Tensorflow's GPU version.
 
