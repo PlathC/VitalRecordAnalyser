@@ -3,6 +3,20 @@
 This tools aims to assist the segmentation of civil registry documents with image processing and machine learning
 algorithms.
 
+## Features
+
+### DatasetBuilder
+
+- Auto segmentation of a text sample image
+- GUI to help and speed up the translation of image text into ascii by the user
+  -  Shortcut (Enter to validate translation, Escape to skip the current image)
+- Provide JSON file containing translated text and segmented fragment into the selected folder
+
+### CivilRegistryAnalyser
+
+- Auto segmentation of a text sample image
+- Detection of text inside fragment images   
+   
 ## Installation
 
 ### Dependencies
