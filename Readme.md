@@ -49,4 +49,5 @@ cmake --build .
 ### Contributors
 
 [Enzo Bonnot](https://github.com/enzo-bonnot)
+
 [Cyprien Plateau--Holleville](https://github.com/PlathC)
