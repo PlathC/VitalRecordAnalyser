@@ -101,13 +101,14 @@ namespace CivilRegistryAnalyzer
             if(!m_textDetection)
                 m_textDetection = std::make_unique<TextDetection>();
             int i = 0;
+            std::reverse(std::begin(m_imageFragments), std::end(m_imageFragments));
             for(const auto& img : m_imageFragments)
             {
                 std::string result = m_textDetection->Process(img);
 
                 if(!result.empty())
                 {
-                    m_extractedText.emplace_back( + "\n");
+                    m_extractedText.emplace_back( result + "\n");
                     std::cout << std::to_string(i++) << " ==> " << m_extractedText.back() << std::endl;
                     UpdateUi();
                 }

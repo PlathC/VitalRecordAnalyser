@@ -37,16 +37,17 @@ def read_text_from_image(img):
 
     model.compile()
 
-    model.load_checkpoint(target="checkpoint_weights.hdf5")
+    model.load_checkpoint(target="./py/checkpoint_weights.hdf5")
 
     predicts, probabilities = model.predict(x_test, ctc_decode=True)
     predicts = [[tokenizer.decode(x) for x in y] for y in predicts]
 
-    max_pred = 0
-    associated_pred = ""
+    # max_pred = 0
+    # associated_pred = ""
     for i, (pred, prob) in enumerate(zip(predicts, probabilities)):
-        for (pd, pb) in zip(pred, prob):
-            if pb > max_pred:
-                max_pred = pb
-                associated_pred = pd
-    return associated_pred
+        return pred[0]
+    #     for (pd, pb) in zip(pred, prob):
+    #         if pb > max_pred:
+    #             max_pred = pb
+    #             associated_pred = pd
+    # return associated_pred
