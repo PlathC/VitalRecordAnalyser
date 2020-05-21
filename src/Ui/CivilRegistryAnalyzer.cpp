@@ -62,7 +62,10 @@ namespace CivilRegistryAnalyzer
             {
                 detectedText += QString::fromStdString(txt);
             }
-            ui->m_lblDetectedText->setText(detectedText);
+            QString txt = ui->m_ptDetectedText->toPlainText();
+            ui->m_ptDetectedText->clear();
+            ui->m_ptDetectedText->setPlainText(detectedText);
+
         }
 
     }
@@ -73,6 +76,17 @@ namespace CivilRegistryAnalyzer
         UpdateUi();
     }
 
+    void CivilRegistryAnalyzer::onProgressChanged(QString info)
+    {
+        m_extractedText.emplace_back(info.toStdString() + "\n");
+        UpdateUi();
+    }
+
+    void CivilRegistryAnalyzer::extractTextFinished()
+    {
+        ui->m_pbDetectWords->setEnabled(true);
+    }
+
     void CivilRegistryAnalyzer::OpenImage()
     {
         auto* dialog = new QFileDialog(this);
@@ -80,16 +94,20 @@ namespace CivilRegistryAnalyzer
         dialog->setFileMode(QFileDialog::FileMode::ExistingFile);
         dialog->setWindowTitle("Select raw dataset images.");
         if(dialog->exec()) {
+            m_imageFragments.clear();
+            m_extractedText.clear();
+
             std::string file = dialog->selectedFiles()[0].toStdString();
             m_src = cv::imread(file);
             UpdateUi();
-            auto *segmenterDialog = new DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file), this);
 
+            auto *segmenterDialog = new DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file), this);
             if (segmenterDialog->exec()) {
                 auto images = segmenterDialog->GetImages();
                 if (!images.empty()) {
                     m_imageFragments.insert(m_imageFragments.end(), images.begin(), images.end());
                 }
+                ui->m_pbDetectWords->setEnabled(true);
             }
         }
     }
@@ -98,26 +116,24 @@ namespace CivilRegistryAnalyzer
     {
         if(!m_imageFragments.empty())
         {
-            if(!m_textDetection)
-                m_textDetection = std::make_unique<TextDetection>();
             int i = 0;
             std::reverse(std::begin(m_imageFragments), std::end(m_imageFragments));
-            for(const auto& img : m_imageFragments)
-            {
-                std::string result = m_textDetection->Process(img);
 
-                if(!result.empty())
-                {
-                    m_extractedText.emplace_back( result + "\n");
-                    std::cout << std::to_string(i++) << " ==> " << m_extractedText.back() << std::endl;
-                    UpdateUi();
-                }
-                else
-                {
-                    std::cout << std::to_string(i++) << " ==> Empty !" << std::endl;
-                }
+            auto* workerThread = new TextDetectionThread(m_imageFragments);
 
-            }
+            // Connect our signal and slot
+            connect(workerThread, SIGNAL(progressChanged(QString)),
+                    SLOT(onProgressChanged(QString)));
+
+            connect(workerThread, SIGNAL(finished()),
+                    workerThread, SLOT(deleteLater()));
+
+            connect(workerThread, SIGNAL(finish()),
+                    workerThread, SLOT(extractTextFinished()));
+
+            ui->m_pbDetectWords->setEnabled(false);
+
+            workerThread->start();
         }
 
     }

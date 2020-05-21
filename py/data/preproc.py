@@ -123,10 +123,10 @@ def preprocess(img, input_size):
     img = cv2.resize(img, new_size)
 
     _, binary = cv2.threshold(img, 254, 255, cv2.THRESH_BINARY)
-    
+
     if np.sum(img) * 0.8 > np.sum(binary):
         img = illumination_compensation(img)
-    
+
     img = remove_cursive_style(img)
 
     target = np.ones([ht, wt], dtype=np.uint8) * 255

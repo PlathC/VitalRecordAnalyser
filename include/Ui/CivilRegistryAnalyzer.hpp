@@ -5,8 +5,8 @@
 #ifndef CIVILREGISTRYANALYSER_CIVILREGISTRYANALYZER_HPP
 #define CIVILREGISTRYANALYSER_CIVILREGISTRYANALYZER_HPP
 
-#include <QMainWindow>
 #include <QFileDialog>
+#include <QMainWindow>
 
 #undef slots
 #include "Model/TextDetection/TextDetection.hpp"
@@ -22,6 +22,37 @@ namespace Ui
 
 namespace CivilRegistryAnalyzer
 {
+    class TextDetectionThread : public QThread
+    {
+        Q_OBJECT
+    public:
+
+        explicit TextDetectionThread(const std::vector<cv::Mat>& imageFragments) :
+                m_imageFragments(imageFragments)
+        {}
+
+        void run() override
+        {
+            m_textDetection = std::make_unique<TextDetection>();
+            for(const auto& img : m_imageFragments)
+            {
+                std::string result = m_textDetection->Process(img);
+
+                if(!result.empty())
+                {
+                    emit progressChanged(QString::fromStdString(result));
+                }
+            }
+            emit finish();
+        }
+    signals:
+        void progressChanged(QString newExtractedText);
+        void finish();
+    private:
+        std::unique_ptr<TextDetection> m_textDetection;
+        std::vector<cv::Mat> m_imageFragments;
+    };
+
     class CivilRegistryAnalyzer : public QMainWindow
     {
     Q_OBJECT
@@ -32,6 +63,9 @@ namespace CivilRegistryAnalyzer
 
         ~CivilRegistryAnalyzer() override;
 
+    public slots:
+        void onProgressChanged(QString info);
+        void extractTextFinished();
     private slots:
         void OpenImage();
         void ExtractText();
@@ -43,7 +77,6 @@ namespace CivilRegistryAnalyzer
         Ui::CivilRegistryAnalyzer* ui;
         cv::Mat m_src;
         std::vector<cv::Mat> m_imageFragments;
-        std::unique_ptr<TextDetection> m_textDetection;
         std::vector<std::string> m_extractedText;
     };
 }

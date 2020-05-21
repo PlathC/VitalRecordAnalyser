@@ -2,7 +2,12 @@
 
 import os
 import numpy as np
+
 import tensorflow as tf
+
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.compat.v1.InteractiveSession(config=config)
 
 from contextlib import redirect_stdout
 from tensorflow.keras import backend as K
@@ -16,7 +21,6 @@ from network.layers import FullGatedConv2D, GatedConv2D, OctConv2D
 from tensorflow.keras.layers import Conv2D, Bidirectional, LSTM, GRU, Dense
 from tensorflow.keras.layers import Dropout, BatchNormalization, LeakyReLU, PReLU
 from tensorflow.keras.layers import Input, Add, Activation, Lambda, MaxPooling2D, Reshape
-
 
 """
 HTRModel Class based on:

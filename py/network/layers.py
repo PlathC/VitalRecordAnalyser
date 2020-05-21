@@ -5,6 +5,11 @@ Gated implementations
                      This process will double number of filters to make one convolutional process.
 """
 import tensorflow as tf
+
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.compat.v1.InteractiveSession(config=config)
+
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer, Conv2D, Multiply, Activation
 
