@@ -7,6 +7,7 @@
 
 #include <QFileDialog>
 #include <QMainWindow>
+#include <QMessageBox>
 
 #undef slots
 #include "Model/TextDetection/TextDetection.hpp"
@@ -14,6 +15,7 @@
 
 #include "Model/ImageUtil.hpp"
 #include "Ui/ImageSegmenterDialog.hpp"
+#include "Model/TextDetection/TextCorrection.hpp"
 
 namespace Ui
 {
@@ -78,6 +80,7 @@ namespace CivilRegistryAnalyzer
         cv::Mat m_src;
         std::vector<cv::Mat> m_imageFragments;
         std::vector<std::string> m_extractedText;
+        std::unique_ptr<TextCorrection> m_textCorrector;
     };
 }
 
