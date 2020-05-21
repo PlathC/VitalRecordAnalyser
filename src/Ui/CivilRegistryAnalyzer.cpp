@@ -147,14 +147,14 @@ namespace CivilRegistryAnalyzer
             auto* workerThread = new TextDetectionThread(m_imageFragments);
 
             // Connect our signal and slot
-            connect(workerThread, SIGNAL(progressChanged(QString)),
-                    SLOT(onProgressChanged(QString)));
+            QObject::connect(workerThread, &TextDetectionThread::progressChanged,
+                        [this](QString v) { onProgressChanged(v); });
 
-            connect(workerThread, SIGNAL(finished()),
-                    workerThread, SLOT(deleteLater()));
+            QObject::connect(workerThread, &QThread::finished,
+                             workerThread, &QObject::deleteLater);
 
-            connect(workerThread, SIGNAL(finish()),
-                    workerThread, SLOT(extractTextFinished()));
+            QObject::connect(workerThread, &QThread::finished,
+                        [this]() { extractTextFinished(); } );
 
             ui->m_pbDetectWords->setEnabled(false);
 
