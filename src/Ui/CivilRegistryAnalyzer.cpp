@@ -9,8 +9,7 @@ namespace CivilRegistryAnalyzer
 {
     CivilRegistryAnalyzer::CivilRegistryAnalyzer(QWidget* parent):
         QMainWindow(parent),
-        ui(new Ui::CivilRegistryAnalyzer),
-        m_textCorrector(nullptr)
+        ui(new Ui::CivilRegistryAnalyzer)
     {
         ui->setupUi(this);
         QObject::connect(ui->m_acOpenImage,
@@ -66,7 +65,6 @@ namespace CivilRegistryAnalyzer
             QString txt = ui->m_ptDetectedText->toPlainText();
             ui->m_ptDetectedText->clear();
             ui->m_ptDetectedText->setPlainText(detectedText);
-
         }
 
     }
@@ -86,30 +84,6 @@ namespace CivilRegistryAnalyzer
     void CivilRegistryAnalyzer::extractTextFinished()
     {
         ui->m_pbDetectWords->setEnabled(true);
-        if(!m_textCorrector)
-            m_textCorrector = std::make_unique<TextCorrection>();
-
-        QMessageBox msgBox;
-        msgBox.setText("The text extraction is finished.");
-        msgBox.setInformativeText("Do you want to autocorrect the sentences ?");
-        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        int ret = msgBox.exec();
-
-        if(ret == QMessageBox::Ok)
-        {
-            if(!m_extractedText.empty())
-            {
-                QString correctedText = "";
-                for(const auto& txt : m_extractedText)
-                {
-                    correctedText += QString::fromStdString(m_textCorrector->Correct(txt));
-                }
-                QString txt = ui->m_ptDetectedText->toPlainText();
-                ui->m_ptDetectedText->clear();
-                ui->m_ptDetectedText->setPlainText(correctedText);
-            }
-        }
     }
 
     void CivilRegistryAnalyzer::OpenImage()
@@ -148,13 +122,13 @@ namespace CivilRegistryAnalyzer
 
             // Connect our signal and slot
             QObject::connect(workerThread, &TextDetectionThread::progressChanged,
-                        [this](QString v) { onProgressChanged(v); });
+                        this, &CivilRegistryAnalyzer::onProgressChanged);
 
             QObject::connect(workerThread, &QThread::finished,
                              workerThread, &QObject::deleteLater);
 
             QObject::connect(workerThread, &QThread::finished,
-                        [this]() { extractTextFinished(); } );
+                        this, &CivilRegistryAnalyzer::extractTextFinished);
 
             ui->m_pbDetectWords->setEnabled(false);
 

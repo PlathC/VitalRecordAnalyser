@@ -10,7 +10,6 @@ TextCorrection::TextCorrection()
         import sys
         sys.path.insert(0,'py')
     )");
-    textCorrection = py::module::import("text_correction");
 }
 
 std::string TextCorrection::Correct(const std::string &sentence)

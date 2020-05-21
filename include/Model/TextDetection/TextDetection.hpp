@@ -12,7 +12,6 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/embed.h>
-#include <pybind11/numpy.h>
 
 #include "MatCaster.hpp"
 
@@ -23,11 +22,11 @@ class TextDetection
 public:
     TextDetection();
     std::string Process(const cv::Mat& src);
-    std::vector<std::string> Process(const std::vector<cv::Mat>& srcs);
-
+    std::string Correct(const std::string &sentence);
 private:
-    py::scoped_interpreter guard{};
+    py::scoped_interpreter interpreter{};
     py::module textDetection;
+    py::module textCorrection;
 };
 
 

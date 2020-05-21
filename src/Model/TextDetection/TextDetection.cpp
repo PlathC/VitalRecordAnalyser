@@ -6,11 +6,20 @@
 
 TextDetection::TextDetection()
 {
-    py::exec(R"(
-        import sys
-        sys.path.insert(0,'py')
-    )");
-    textDetection = py::module::import("text_detection");
+    try
+    {
+        py::exec(R"(
+            import sys
+            sys.path.insert(0,'py')
+        )");
+        textDetection = py::module::import("text_detection");
+        textCorrection = py::module::import("text_correction");
+        textDetection.attr("load_model")();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 }
 
 std::string TextDetection::Process(const cv::Mat& src)
@@ -18,7 +27,7 @@ std::string TextDetection::Process(const cv::Mat& src)
     try
     {
         py::object result = textDetection.attr("read_text_from_image")(src);
-        std::string output = result.cast<std::string>();
+        auto output = result.cast<std::string>();
         return output;
     }
     catch(const std::exception& e)
@@ -28,18 +37,18 @@ std::string TextDetection::Process(const cv::Mat& src)
     }
 }
 
-std::vector<std::string> TextDetection::Process(const std::vector<cv::Mat>& srcs)
+
+std::string TextDetection::Correct(const std::string &sentence)
 {
     try
     {
-        py::object result = textDetection.attr("read_text_from_image")(srcs);
-        auto output = result.cast<std::vector<std::string>>();
+        py::object result = textCorrection.attr("correct_sentence")(sentence);
+        auto output = result.cast<std::string>();
         return output;
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what();
-        return {};
+        return "";
     }
 }
-

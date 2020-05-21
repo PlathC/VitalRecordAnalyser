@@ -63,6 +63,9 @@
     </item>
     <item alignment="Qt::AlignHCenter">
      <widget class="QPushButton" name="m_pbDetectWords">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>

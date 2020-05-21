@@ -10,12 +10,15 @@
 #include <QMessageBox>
 
 #undef slots
+#include <pybind11/pybind11.h>
+#include <pybind11/embed.h>
+
 #include "Model/TextDetection/TextDetection.hpp"
+#include "Model/TextDetection/TextCorrection.hpp"
 #define slots
 
 #include "Model/ImageUtil.hpp"
 #include "Ui/ImageSegmenterDialog.hpp"
-#include "Model/TextDetection/TextCorrection.hpp"
 
 namespace Ui
 {
@@ -28,30 +31,32 @@ namespace CivilRegistryAnalyzer
     {
         Q_OBJECT
     public:
-
         explicit TextDetectionThread(const std::vector<cv::Mat>& imageFragments) :
-                m_imageFragments(imageFragments)
+            m_imageFragments(imageFragments)
         {}
 
         void run() override
         {
-            m_textDetection = std::make_unique<TextDetection>();
-            for(const auto& img : m_imageFragments)
             {
-                std::string result = m_textDetection->Process(img);
-
-                if(!result.empty())
+                TextDetection textDetection;
+                for(const auto& img : m_imageFragments)
                 {
-                    emit progressChanged(QString::fromStdString(result));
+                    std::string result = textDetection.Process(img);
+
+                    if(!result.empty())
+                    {
+                        result = textDetection.Correct(result);
+                        emit progressChanged(QString::fromStdString(result));
+                    }
                 }
             }
+
             emit finish();
         }
     signals:
         void progressChanged(QString newExtractedText);
         void finish();
     private:
-        std::unique_ptr<TextDetection> m_textDetection;
         std::vector<cv::Mat> m_imageFragments;
     };
 
@@ -80,7 +85,6 @@ namespace CivilRegistryAnalyzer
         cv::Mat m_src;
         std::vector<cv::Mat> m_imageFragments;
         std::vector<std::string> m_extractedText;
-        std::unique_ptr<TextCorrection> m_textCorrector;
     };
 }
 

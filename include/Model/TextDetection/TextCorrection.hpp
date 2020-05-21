@@ -10,7 +10,6 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/embed.h>
-#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 
@@ -20,7 +19,6 @@ public:
     std::string Correct(const std::string& sentence);
 
 private:
-    py::scoped_interpreter guard{};
     py::module textCorrection;
 };
 
