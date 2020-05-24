@@ -9,7 +9,7 @@
 #include <string>
 #include <filesystem>
 
-#include "include/Model/TextSegmentation/TextSegmentation.hpp"
+#include "Model/TextSegmentation/TextSegmentation.hpp"
 
 #include "DatasetImage.hpp"
 
