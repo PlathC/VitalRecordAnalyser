@@ -14,6 +14,8 @@ text = "L ' An mil neuf cent un , le Quatres Janvier de feuilles ah a cinq heure
        "Belfort decide jesus HeH ( on ) , el 1 Le 6 Juin 198 Et ont les et temoins , signe avec" \
        " nous le present acte , apres lecture . boulder npr parie "
 
+spacy.prefer_gpu()
+
 nlp = spacy.load("fr_core_news_sm")
 doc = nlp(text)
 for ent in doc.ents:
