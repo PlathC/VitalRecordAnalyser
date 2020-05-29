@@ -5,6 +5,9 @@
 #ifndef CIVILREGISTRYANALYSER_CIVILREGISTRYANALYZER_HPP
 #define CIVILREGISTRYANALYSER_CIVILREGISTRYANALYZER_HPP
 
+#include <fstream>
+#include <map>
+
 #include <QFileDialog>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -25,6 +28,12 @@ namespace Ui
     class CivilRegistryAnalyzer;
 }
 
+using CsvHolder = std::map<std::string, std::string>;
+using ParagraphHolder = std::vector<std::string>;
+Q_DECLARE_METATYPE(std::string)
+Q_DECLARE_METATYPE(ParagraphHolder)
+Q_DECLARE_METATYPE(CsvHolder)
+
 namespace CivilRegistryAnalyzer
 {
     class TextDetectionThread : public QThread
@@ -37,25 +46,36 @@ namespace CivilRegistryAnalyzer
 
         void run() override
         {
+            std::string completeResult = "";
+            TextDetection textDetection;
+            for(const auto& img : m_imageFragments)
             {
-                TextDetection textDetection;
-                for(const auto& img : m_imageFragments)
-                {
-                    std::string result = textDetection.Process(img);
+                std::string result = textDetection.Process(img);
 
-                    if(!result.empty())
-                    {
-                        result = textDetection.Correct(result);
-                        emit progressChanged(QString::fromStdString(result));
-                    }
+                if(!result.empty())
+                {
+                    completeResult += result;
+                    emit progressChanged(QString::fromStdString(result));
                 }
+            }
+            std::vector<std::string> textsParagraphs = textDetection.Correct(completeResult);
+            emit onNewCorrectedText(textsParagraphs);
+
+            for(auto& paragraph: textsParagraphs)
+            {
+                auto analysis = textDetection.AnalyseText(completeResult);
+
+                emit onNewAnalysis(analysis);
             }
 
             emit finish();
         }
     signals:
         void progressChanged(QString newExtractedText);
+        void onNewCorrectedText(std::vector<std::string> newExtractedText);
+        void onNewAnalysis(std::map<std::string, std::string> newAnalysis);
         void finish();
+
     private:
         std::vector<cv::Mat> m_imageFragments;
     };
@@ -73,6 +93,9 @@ namespace CivilRegistryAnalyzer
     public slots:
         void onProgressChanged(QString info);
         void extractTextFinished();
+        void onNewAnalysis(std::map<std::string, std::string> newAnalysis);
+        void onNewCorrectedText(std::vector<std::string> newExtractedText);
+
     private slots:
         void OpenImage();
         void ExtractText();

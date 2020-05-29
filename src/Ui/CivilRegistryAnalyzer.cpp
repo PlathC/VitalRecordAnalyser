@@ -60,13 +60,12 @@ namespace CivilRegistryAnalyzer
             QString detectedText = "";
             for(const auto& txt : m_extractedText)
             {
-                detectedText += QString::fromStdString(txt);
+                detectedText += QString::fromStdString(txt) + "\n";
             }
             QString txt = ui->m_ptDetectedText->toPlainText();
             ui->m_ptDetectedText->clear();
             ui->m_ptDetectedText->setPlainText(detectedText);
         }
-
     }
 
     void CivilRegistryAnalyzer::resizeEvent(QResizeEvent* event)
@@ -85,6 +84,44 @@ namespace CivilRegistryAnalyzer
     {
         ui->m_pbDetectWords->setEnabled(true);
     }
+
+    void CivilRegistryAnalyzer::onNewAnalysis(std::map<std::string, std::string> newAnalysis)
+    {
+        constexpr std::string_view outputCsv = "outputCsv";
+
+        std::ifstream readFile(outputCsv);
+
+        if(!readFile.good())
+        {
+            readFile.close();
+            std::ofstream writeFile{"outputCsv", std::ios::app};
+            for (const auto & newAnalyse : newAnalysis)
+            {
+                writeFile << newAnalyse.first << ",";
+            }
+            writeFile << std::endl;
+            writeFile.close();
+        }
+        std::ofstream writeFile{"outputCsv", std::ios::app};
+
+        for (const auto & newAnalyse : newAnalysis)
+        {
+            writeFile << newAnalyse.second << ",";
+        }
+        writeFile << std::endl;
+        writeFile.close();
+    }
+
+    void CivilRegistryAnalyzer::onNewCorrectedText(std::vector<std::string> newExtractedText)
+    {
+        m_extractedText.clear();
+        for(auto& ntext : newExtractedText)
+        {
+            m_extractedText.emplace_back(ntext);
+        }
+        UpdateUi();
+    }
+
 
     void CivilRegistryAnalyzer::OpenImage()
     {
@@ -120,9 +157,18 @@ namespace CivilRegistryAnalyzer
 
             auto* workerThread = new TextDetectionThread(m_imageFragments);
 
+            qRegisterMetaType<std::vector<std::string> >("std::vector<std::string>");
+            qRegisterMetaType<std::map<std::string, std::string>>("std::map<std::string, std::string>");
+
             // Connect our signal and slot
             QObject::connect(workerThread, &TextDetectionThread::progressChanged,
-                        this, &CivilRegistryAnalyzer::onProgressChanged);
+                             this, &CivilRegistryAnalyzer::onProgressChanged);
+
+            QObject::connect(workerThread, &TextDetectionThread::onNewCorrectedText,
+                             this, &CivilRegistryAnalyzer::onNewCorrectedText);
+
+            QObject::connect(workerThread, &TextDetectionThread::onNewAnalysis,
+                             this, &CivilRegistryAnalyzer::onNewAnalysis);
 
             QObject::connect(workerThread, &QThread::finished,
                              workerThread, &QObject::deleteLater);

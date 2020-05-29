@@ -14,7 +14,10 @@ TextDetection::TextDetection()
         )");
         textDetection = py::module::import("text_detection");
         textCorrection = py::module::import("text_correction");
+
+        textAnalyser = py::module::import("nlp");
         textDetection.attr("load_model")();
+        textAnalyser.attr("init_nlp_module")();
     }
     catch(const std::exception& e)
     {
@@ -38,17 +41,38 @@ std::string TextDetection::Process(const cv::Mat& src)
 }
 
 
-std::string TextDetection::Correct(const std::string &sentence)
+std::vector<std::string> TextDetection::Correct(const std::string &text)
 {
     try
     {
-        py::object result = textCorrection.attr("correct_sentence")(sentence);
-        auto output = result.cast<std::string>();
+        py::object result = textCorrection.attr("paragraphize")(text);
+        auto resultParagraphs = result.cast<std::vector<std::string>>();
+        for(auto& str : resultParagraphs)
+        {
+            std::cout << "Processing " << str <<std::endl;
+            resultParagraphs.emplace_back(textCorrection.attr("correct_sentence")(str).cast<std::string>());
+        }
+
+        auto output = result.cast<std::vector<std::string>>();
         return output;
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what();
-        return "";
+        return {};
+    }
+}
+
+std::map<std::string, std::string> TextDetection::AnalyseText(const std::string& text)
+{
+    try
+    {
+        py::object result = textAnalyser.attr("process_text")(text);
+        return result.cast<std::map<std::string, std::string>>();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what();
+        return {};
     }
 }
