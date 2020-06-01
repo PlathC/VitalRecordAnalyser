@@ -66,6 +66,10 @@ namespace CivilRegistryAnalyzer
             ui->m_ptDetectedText->clear();
             ui->m_ptDetectedText->setPlainText(detectedText);
         }
+        else
+        {
+            ui->m_ptDetectedText->clear();
+        }
     }
 
     void CivilRegistryAnalyzer::resizeEvent(QResizeEvent* event)
@@ -87,14 +91,14 @@ namespace CivilRegistryAnalyzer
 
     void CivilRegistryAnalyzer::onNewAnalysis(std::map<std::string, std::string> newAnalysis)
     {
-        constexpr std::string_view outputCsv = "outputCsv";
+        const std::string outputCsv = "outputCsv.csv";
 
         std::ifstream readFile(outputCsv);
 
         if(!readFile.good())
         {
             readFile.close();
-            std::ofstream writeFile{"outputCsv", std::ios::app};
+            std::ofstream writeFile{outputCsv, std::ios::app};
             for (const auto & newAnalyse : newAnalysis)
             {
                 writeFile << newAnalyse.first << ",";
@@ -102,7 +106,7 @@ namespace CivilRegistryAnalyzer
             writeFile << std::endl;
             writeFile.close();
         }
-        std::ofstream writeFile{"outputCsv", std::ios::app};
+        std::ofstream writeFile{outputCsv, std::ios::app};
 
         for (const auto & newAnalyse : newAnalysis)
         {
@@ -138,12 +142,16 @@ namespace CivilRegistryAnalyzer
             UpdateUi();
 
             auto *segmenterDialog = new DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file), this);
-            if (segmenterDialog->exec()) {
+            if (segmenterDialog->exec())
+            {
                 auto images = segmenterDialog->GetImages();
-                if (!images.empty()) {
+
+                if (!images.empty())
+                {
                     m_imageFragments.insert(m_imageFragments.end(), images.begin(), images.end());
                 }
                 ui->m_pbDetectWords->setEnabled(true);
+                UpdateUi();
             }
         }
     }
@@ -152,7 +160,7 @@ namespace CivilRegistryAnalyzer
     {
         if(!m_imageFragments.empty())
         {
-            int i = 0;
+
             std::reverse(std::begin(m_imageFragments), std::end(m_imageFragments));
 
             auto* workerThread = new TextDetectionThread(m_imageFragments);
@@ -177,6 +185,7 @@ namespace CivilRegistryAnalyzer
                         this, &CivilRegistryAnalyzer::extractTextFinished);
 
             ui->m_pbDetectWords->setEnabled(false);
+            std::cout << "LAUNCHING THREAD " << std::endl;
 
             workerThread->start();
         }

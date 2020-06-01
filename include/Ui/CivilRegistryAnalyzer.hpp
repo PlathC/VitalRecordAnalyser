@@ -17,7 +17,6 @@
 #include <pybind11/embed.h>
 
 #include "Model/TextDetection/TextDetection.hpp"
-#include "Model/TextDetection/TextCorrection.hpp"
 #define slots
 
 #include "Model/ImageUtil.hpp"
@@ -46,8 +45,9 @@ namespace CivilRegistryAnalyzer
 
         void run() override
         {
-            std::string completeResult = "";
+            std::string completeResult;
             TextDetection textDetection;
+
             for(const auto& img : m_imageFragments)
             {
                 std::string result = textDetection.Process(img);
@@ -58,13 +58,13 @@ namespace CivilRegistryAnalyzer
                     emit progressChanged(QString::fromStdString(result));
                 }
             }
+
             std::vector<std::string> textsParagraphs = textDetection.Correct(completeResult);
             emit onNewCorrectedText(textsParagraphs);
 
             for(auto& paragraph: textsParagraphs)
             {
-                auto analysis = textDetection.AnalyseText(completeResult);
-
+                auto analysis = textDetection.AnalyseText(paragraph);
                 emit onNewAnalysis(analysis);
             }
 
@@ -86,7 +86,7 @@ namespace CivilRegistryAnalyzer
     public:
         explicit CivilRegistryAnalyzer(QWidget* parent = nullptr);
 
-        void resizeEvent(QResizeEvent* event);
+        void resizeEvent(QResizeEvent* event) override;
 
         ~CivilRegistryAnalyzer() override;
 

@@ -65,7 +65,7 @@ set(CRA_HEADERS
         "include/Model/TextSegmentation/Scanner.hpp"
         "include/Model/TextSegmentation/WordSegmentation.hpp"
         "include/Model/TextSegmentation/TextSegmentation.hpp"
-        "include/Model/TextDetection/TextCorrection.hpp")
+        )
 
 set(CRA_SOURCES
         "src/CivilRegistryAnalyzer/main.cpp"
@@ -77,7 +77,7 @@ set(CRA_SOURCES
         "src/Model/TextSegmentation/Scanner.cpp"
         "src/Model/TextSegmentation/WordSegmentation.cpp"
         "src/Model/TextSegmentation/TextSegmentation.cpp"
-        "src/Model/TextDetection/TextCorrection.cpp")
+        )
 
 set(CRA_UI
         "src/Ui/ImageSegmenterDialog.ui"

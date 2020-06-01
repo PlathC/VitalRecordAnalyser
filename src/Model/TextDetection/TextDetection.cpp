@@ -12,6 +12,7 @@ TextDetection::TextDetection()
             import sys
             sys.path.insert(0,'py')
         )");
+
         textDetection = py::module::import("text_detection");
         textCorrection = py::module::import("text_correction");
 
@@ -20,6 +21,10 @@ TextDetection::TextDetection()
         textAnalyser.attr("init_nlp_module")();
     }
     catch(const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    catch(const py::error_already_set& e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -49,7 +54,6 @@ std::vector<std::string> TextDetection::Correct(const std::string &text)
         auto resultParagraphs = result.cast<std::vector<std::string>>();
         for(auto& str : resultParagraphs)
         {
-            std::cout << "Processing " << str <<std::endl;
             resultParagraphs.emplace_back(textCorrection.attr("correct_sentence")(str).cast<std::string>());
         }
 

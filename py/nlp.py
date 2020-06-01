@@ -1,11 +1,12 @@
 import spacy
 
+
 def wait_for_and_add(document, curr_ite, dictionary, list_key, label):
     if len(document.ents) > curr_ite:
         curr_entity = document.ents[curr_ite]
         while len(document.ents) > curr_ite and curr_entity.label_ != label:
-            curr_ite += 1
             curr_entity = document.ents[curr_ite]
+            curr_ite += 1
 
         if len(document.ents) > curr_ite:
             dictionary[list_key] = curr_entity.text
@@ -33,9 +34,6 @@ nlp = None
 
 def init_nlp_module():
     global nlp
-
-    spacy.prefer_gpu()
-
     nlp = spacy.load("fr_core_news_sm")
 
 

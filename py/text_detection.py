@@ -5,6 +5,8 @@ import os
 import string
 import datetime
 
+from numba import cuda
+
 import tensorflow as tf
 
 from data import preproc as pp, evaluation
