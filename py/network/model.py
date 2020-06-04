@@ -261,6 +261,8 @@ class HTRModel:
         # so sum of non-zero gives number of characters in this string
         label_length = tf.math.count_nonzero(y_true, axis=-1, keepdims=True, dtype="int64")
 
+        # if you have an error when training go to the definition of the ctc_batch_cost function and add
+        # 'ignore_longer_outputs_than_inputs=True' in the parameters of the ctc.ctc_loss() function line 5764
         loss = K.ctc_batch_cost(y_true, y_pred, input_length, label_length)
 
         # average loss across all entries in the batch
