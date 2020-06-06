@@ -17,7 +17,8 @@ algorithms.
 ### CivilRegistryAnalyser
 
 - Auto segmentation of a text sample image
-- Detection of text inside fragment images   
+- Text recognition on fragmented images
+- Text features extractions with NLP.
 
 ## Assets
 
