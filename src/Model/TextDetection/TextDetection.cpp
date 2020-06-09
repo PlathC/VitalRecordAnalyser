@@ -24,10 +24,6 @@ TextDetection::TextDetection()
     {
         std::cerr << e.what() << std::endl;
     }
-    catch(const py::error_already_set& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
 }
 
 std::string TextDetection::Process(const cv::Mat& src)
