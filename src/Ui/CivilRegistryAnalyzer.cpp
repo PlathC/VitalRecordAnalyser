@@ -87,6 +87,8 @@ namespace CivilRegistryAnalyzer
     void CivilRegistryAnalyzer::extractTextFinished()
     {
         ui->m_pbDetectWords->setEnabled(true);
+        QMessageBox::information(this, "Information", "The analysis is done, you can find"
+                                                      " the outputCsv.csv at the root path of this program.");
     }
 
     void CivilRegistryAnalyzer::onNewAnalysis(std::map<std::string, std::string> newAnalysis)
@@ -114,9 +116,6 @@ namespace CivilRegistryAnalyzer
         }
         writeFile << std::endl;
         writeFile.close();
-
-        QMessageBox::information(this, "Information", "The analysis is done, you can find"
-                                                      " the outputCsv.csv at the root path of this program.");
     }
 
     void CivilRegistryAnalyzer::onNewCorrectedText(std::vector<std::string> newExtractedText)
@@ -180,6 +179,9 @@ namespace CivilRegistryAnalyzer
 
             QObject::connect(workerThread, &TextDetectionThread::onNewAnalysis,
                              this, &CivilRegistryAnalyzer::onNewAnalysis);
+
+            QObject::connect(workerThread, &TextDetectionThread::finish,
+                             this, &CivilRegistryAnalyzer::extractTextFinished);
 
             QObject::connect(workerThread, &QThread::finished,
                              workerThread, &QObject::deleteLater);
