@@ -45,6 +45,7 @@ namespace CivilRegistryAnalyzer
 
         void run() override
         {
+            pybind11::gil_scoped_acquire acquire;
             std::string completeResult;
             TextDetection textDetection;
 
@@ -77,6 +78,11 @@ namespace CivilRegistryAnalyzer
         void finish();
 
     private:
+        /* See
+           https://github.com/pybind/pybind11/issues/1723#issuecomment-475226782
+           https://github.com/pybind/pybind11/issues/1273#issuecomment-366449829
+        */
+        pybind11::gil_scoped_release guard{};
         std::vector<cv::Mat> m_imageFragments;
     };
 
@@ -108,6 +114,9 @@ namespace CivilRegistryAnalyzer
         cv::Mat m_src;
         std::vector<cv::Mat> m_imageFragments;
         std::vector<std::string> m_extractedText;
+
+        py::scoped_interpreter interpreter{};
+
     };
 }
 

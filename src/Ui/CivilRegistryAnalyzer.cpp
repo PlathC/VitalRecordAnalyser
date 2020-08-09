@@ -89,6 +89,8 @@ namespace CivilRegistryAnalyzer
         ui->m_pbDetectWords->setEnabled(true);
         QMessageBox::information(this, "Information", "The analysis is done, you can find"
                                                       " the outputCsv.csv at the root path of this program.");
+
+        pybind11::gil_scoped_acquire();
     }
 
     void CivilRegistryAnalyzer::onNewAnalysis(std::map<std::string, std::string> newAnalysis)
