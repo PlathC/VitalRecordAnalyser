@@ -9,10 +9,12 @@ def paragraphize(text):
 
     ranges = [m.start() for m in re.finditer(r'\b(an)\b', text.lower())]
 
-    result_texts.append(text[0:ranges[1]])
-    for i in range(2, len(ranges)):
-        result_texts.append(text[ranges[i-1]:ranges[i]])
-
+    if len(ranges) >= 1:
+        result_texts.append(text[0:ranges[2]])
+        for i in range(2, len(ranges)):
+            result_texts.append(text[ranges[i-1]:ranges[i]])
+    else:
+        result_texts = text
     return result_texts
 
 
