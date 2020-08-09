@@ -6,3 +6,4 @@ numba==0.47.0
 opencv-python==4.1.2.30
 tensorflow==2.1.0
 pyspellchecker==0.5.4
+spacy
