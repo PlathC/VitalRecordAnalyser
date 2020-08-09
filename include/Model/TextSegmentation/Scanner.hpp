@@ -9,7 +9,7 @@ class Scanner {
 	    bool cropped;
 
     private:
-        void processEdge(cv::Mat input, cv::Mat &output, int openKSize, int closeKSize, bool gaussianBlur);
-        void fourPointTransform(cv::Mat src, cv::Mat &dst, std::vector<cv::Point> pts);
-        void orderPoints(std::vector<cv::Point> inpts, std::vector<cv::Point> &ordered);
+        void processEdge(const cv::Mat& input, cv::Mat &output, int openKSize, int closeKSize, bool gaussianBlur);
+        void fourPointTransform(const cv::Mat& src, cv::Mat &dst, const std::vector<cv::Point>& pts);
+        void orderPoints(const std::vector<cv::Point>& inpts, std::vector<cv::Point> &ordered);
 };

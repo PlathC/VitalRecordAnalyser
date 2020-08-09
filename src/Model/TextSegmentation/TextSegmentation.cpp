@@ -112,7 +112,7 @@ void TextSegmentation::Process()
     }), detectedArea.end());
 
 
-    uint8_t step = 80 / detectedArea.size();
+    uint8_t step = static_cast<uint8_t>(80 / detectedArea.size());
     for(const auto& img : detectedArea)
     {
         std::vector<cv::Mat> extracted = ExtractWords(img);

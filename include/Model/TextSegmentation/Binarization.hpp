@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
 
@@ -21,7 +22,7 @@ class Binarization {
     private:
         void getHistogram(cv::Mat image);
         void getHR(float sqrtHW);
-        void getCEI(cv::Mat grayscale);
+        void getCEI(const cv::Mat& grayscale);
         void getEdge(cv::Mat grayscale);
         void getTLI(cv::Mat grayscale);
 

@@ -218,7 +218,7 @@ void LineSegmentation::generateRegions() {
     }
 
     if (this->lineRegions.size() > 0)
-        this->avgLineHeight /= this->lineRegions.size();
+        this->avgLineHeight /= static_cast<int>(this->lineRegions.size());
 }
 
 void LineSegmentation::repairLines() {
@@ -286,8 +286,8 @@ bool LineSegmentation::componentBelongsToAboveRegion(Line &line, cv::Rect &conto
             n++;
 
             cv::Mat contourPoint = cv::Mat::zeros(1, 2, CV_32F);
-            contourPoint.at<float>(0, 0) = j;
-            contourPoint.at<float>(0, 1) = i;
+            contourPoint.at<float>(0, 0) = static_cast<float>(j);
+            contourPoint.at<float>(0, 1) = static_cast<float>(i);
 
             int newProbAbove = (int) ((line.above != nullptr) ? (line.above->biVariateGaussianDensity(
                     contourPoint.clone())) : 0);
@@ -575,26 +575,33 @@ bool Region::updateRegion(cv::Mat &binaryImg, int regionID) {
     return countNonZero(region) == region.cols * region.rows;
 }
 
-void Region::calculateMean() {
+void Region::calculateMean()
+{
     mean[0] = mean[1] = 0.0f;
     int n = 0;
 
-    for (int i = 0; i < region.rows; i++) {
-        for (int j = 0; j < region.cols; j++) {
+    for (int i = 0; i < region.rows; i++)
+    {
+        for (int j = 0; j < region.cols; j++)
+        {
             if (region.at<uchar>(i, j) == 255) continue;
 
-            if (n == 0) {
+            if (n == 0)
+            {
                 n = n + 1;
-                mean = cv::Vec2f(i + rowOffset, j);
-            } else {
-                mean = (n - 1.0) / n * mean + 1.0 / n * cv::Vec2f(i + rowOffset, j);
+                mean = cv::Vec2f(static_cast<float>(i + rowOffset), static_cast<float>(j));
+            }
+            else
+            {
+                mean = (n - 1.0) / n * mean + 1.0 / n * cv::Vec2f(static_cast<float>(i + rowOffset), static_cast<float>(j));
                 n = n + 1;
             }
         }
     }
 }
 
-void Region::calculateCovariance() {
+void Region::calculateCovariance()
+{
     cv::Mat covariance = cv::Mat::zeros(2, 2, CV_32F);
 
     int n = 0;
