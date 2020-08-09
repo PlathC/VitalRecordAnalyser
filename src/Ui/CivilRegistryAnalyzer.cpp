@@ -123,9 +123,9 @@ namespace CivilRegistryAnalyzer
     void CivilRegistryAnalyzer::onNewCorrectedText(std::vector<std::string> newExtractedText)
     {
         m_extractedText.clear();
-        for(auto& ntext : newExtractedText)
+        for(const auto& nText : newExtractedText)
         {
-            m_extractedText.emplace_back(ntext);
+            m_extractedText.emplace_back(nText);
         }
         UpdateUi();
     }
@@ -138,7 +138,7 @@ namespace CivilRegistryAnalyzer
         dialog->setFileMode(QFileDialog::FileMode::ExistingFile);
         dialog->setWindowTitle("Select raw dataset images.");
         if(dialog->exec()) {
-            m_imageFragments.clear();
+            m_paragraphsFragments.clear();
             m_extractedText.clear();
 
             std::string file = dialog->selectedFiles()[0].toStdString();
@@ -148,11 +148,17 @@ namespace CivilRegistryAnalyzer
             auto *segmenterDialog = new DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file), this);
             if (segmenterDialog->exec())
             {
-                auto images = segmenterDialog->GetImages();
+                auto paragraphs = segmenterDialog->GetParagraphs();
 
-                if (!images.empty())
+                if (!paragraphs.empty())
                 {
-                    m_imageFragments.insert(m_imageFragments.end(), images.begin(), images.end());
+                    for(const auto& paragraph : paragraphs)
+                    {
+                        if(!paragraph.empty())
+                        {
+                            m_paragraphsFragments.emplace_back(paragraph);
+                        }
+                    }
                 }
                 ui->m_pbDetectWords->setEnabled(true);
                 UpdateUi();
@@ -162,12 +168,9 @@ namespace CivilRegistryAnalyzer
 
     void CivilRegistryAnalyzer::ExtractText()
     {
-        if(!m_imageFragments.empty())
+        if(!m_paragraphsFragments.empty())
         {
-
-            std::reverse(std::begin(m_imageFragments), std::end(m_imageFragments));
-
-            auto* workerThread = new TextDetectionThread(m_imageFragments);
+            auto* workerThread = new TextDetectionThread(m_paragraphsFragments);
 
             qRegisterMetaType<std::vector<std::string> >("std::vector<std::string>");
             qRegisterMetaType<std::map<std::string, std::string>>("std::map<std::string, std::string>");

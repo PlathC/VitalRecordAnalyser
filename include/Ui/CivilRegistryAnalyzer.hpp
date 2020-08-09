@@ -39,31 +39,42 @@ namespace CivilRegistryAnalyzer
     {
         Q_OBJECT
     public:
-        explicit TextDetectionThread(const std::vector<cv::Mat>& imageFragments) :
-            m_imageFragments(imageFragments)
+        explicit TextDetectionThread(const std::vector<std::vector<cv::Mat>>& paragraphs) :
+                m_paragraphs(paragraphs)
         {}
 
         void run() override
         {
             pybind11::gil_scoped_acquire acquire;
+            std::vector<std::string> paragraphsResults;
             std::string completeResult;
             TextDetection textDetection;
 
-            for(const auto& img : m_imageFragments)
+            for(const auto& paragraph : m_paragraphs)
             {
-                std::string result = textDetection.Process(img);
-
-                if(!result.empty())
+                for(const auto& word : paragraph)
                 {
-                    completeResult += result;
-                    emit progressChanged(QString::fromStdString(result));
+                    std::string result = textDetection.Process(word);
+                    if(!result.empty())
+                    {
+                        completeResult += result;
+                        emit progressChanged(QString::fromStdString(result));
+                    }
+                }
+                if(!completeResult.empty())
+                {
+                    paragraphsResults.emplace_back(completeResult);
+                    completeResult.clear();
                 }
             }
 
-            std::vector<std::string> textsParagraphs = textDetection.Correct(completeResult);
-            emit onNewCorrectedText(textsParagraphs);
+            for(auto& paragraph : paragraphsResults)
+            {
+                paragraph = textDetection.Correct(paragraph);
+            }
+            emit onNewCorrectedText(paragraphsResults);
 
-            for(auto& paragraph: textsParagraphs)
+            for(auto& paragraph: paragraphsResults)
             {
                 auto analysis = textDetection.AnalyseText(paragraph);
                 emit onNewAnalysis(analysis);
@@ -83,7 +94,7 @@ namespace CivilRegistryAnalyzer
            https://github.com/pybind/pybind11/issues/1273#issuecomment-366449829
         */
         pybind11::gil_scoped_release guard{};
-        std::vector<cv::Mat> m_imageFragments;
+        std::vector<std::vector<cv::Mat>> m_paragraphs;
     };
 
     class CivilRegistryAnalyzer : public QMainWindow
@@ -112,7 +123,7 @@ namespace CivilRegistryAnalyzer
     private:
         Ui::CivilRegistryAnalyzer* ui;
         cv::Mat m_src;
-        std::vector<cv::Mat> m_imageFragments;
+        std::vector<std::vector<cv::Mat>> m_paragraphsFragments;
         std::vector<std::string> m_extractedText;
 
         py::scoped_interpreter interpreter{};

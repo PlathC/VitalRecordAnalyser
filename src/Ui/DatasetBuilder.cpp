@@ -91,10 +91,16 @@ namespace DatasetBuilder
 
                 if(segmenterDialog->exec())
                 {
-                    auto images = segmenterDialog->GetImages();
-                    if(!images.empty())
+                    auto paragraphs = segmenterDialog->GetParagraphs();
+                    if(!paragraphs.empty())
                     {
-                        m_sets.emplace_back(file.toStdString(), images, m_outputFolder);
+                        std::vector<cv::Mat> flattenPage;
+                        for(const auto& paragraph : paragraphs)
+                        {
+                            flattenPage.insert(flattenPage.end(), paragraph.begin(), paragraph.end());
+                        }
+
+                        m_sets.emplace_back(file.toStdString(), flattenPage, m_outputFolder);
                     }
                 }
             }

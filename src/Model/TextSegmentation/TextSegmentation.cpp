@@ -43,15 +43,15 @@ uint8_t TextSegmentation::Progress()
     return m_progress;
 }
 
-std::vector<cv::Mat> TextSegmentation::GetExtractedWords()
+std::vector<std::vector<cv::Mat>> TextSegmentation::GetExtractedWords()
 {
     std::lock_guard lock{m_imagesLock};
-    return m_processedImages;
+    return m_extractedWords;
 }
 
 void TextSegmentation::Process()
 {
-    std::vector<cv::Mat> detectedWords;
+    std::vector<std::vector<cv::Mat>> detectedParagraphs;
     cv::Mat blurred;
     cv::blur(m_src, blurred, cv::Point(11, 11));
 
@@ -117,17 +117,20 @@ void TextSegmentation::Process()
     {
         std::vector<cv::Mat> extracted = ExtractWords(img);
 
-        detectedWords.insert(detectedWords.begin(), extracted.begin(), extracted.end());
+        detectedParagraphs.emplace_back(extracted);
 
         std::lock_guard lock{m_progressLocker};
         m_progress += step;
     }
 
-    std::reverse(std::begin(detectedWords), std::end(detectedWords));
+    // Handle detection sens to provide the detection in a correct left to right / up to down way
+
+    std::reverse(std::begin(detectedParagraphs), std::end(detectedParagraphs));
 
     std::lock_guard lockImg{m_imagesLock};
-    m_processedImages.insert(m_processedImages.begin(), detectedWords.begin(), detectedWords.end());
+    m_extractedWords = detectedParagraphs;
     std::lock_guard lockProgress{m_progressLocker};
+
     m_progress = 100;
 }
 

@@ -40,18 +40,20 @@ def init_nlp_module():
 def process_text(text):
     global nlp
     doc = nlp(text)
+    if len(doc.ents) != 0:
+        dic = {}
 
-    dic = {}
+        curr_ent = doc.ents[0]
+        ite = 1
 
-    curr_ent = doc.ents[0]
-    ite = 1
+        ite, dic = wait_for_and_add(doc, ite, dic, 'Naissance', 'MISC')
+        ite, dic = wait_for_and_add(doc, ite, dic, 'LieuNaissance', 'LOC')
+        ite, dic = wait_for_and_add(doc, ite, dic, 'Déclarant', 'PER')
+        ite, dic = wait_for_and_add(doc, ite, dic, 'Mère', 'PER')
+        ite, dic = wait_for_and_add(doc, ite, dic, 'NomEnfant', 'PER')
+        ite, dic = wait_for_and_add(doc, ite, dic, 'Témoins1', 'PER')
+        ite, dic = wait_for_and_add(doc, ite, dic, 'Témoins2', 'PER')
 
-    ite, dic = wait_for_and_add(doc, ite, dic, 'Naissance', 'MISC')
-    ite, dic = wait_for_and_add(doc, ite, dic, 'LieuNaissance', 'LOC')
-    ite, dic = wait_for_and_add(doc, ite, dic, 'Déclarant', 'PER')
-    ite, dic = wait_for_and_add(doc, ite, dic, 'Mère', 'PER')
-    ite, dic = wait_for_and_add(doc, ite, dic, 'NomEnfant', 'PER')
-    ite, dic = wait_for_and_add(doc, ite, dic, 'Témoins1', 'PER')
-    ite, dic = wait_for_and_add(doc, ite, dic, 'Témoins2', 'PER')
-
-    return dic
+        return dic
+    else:
+        return {}

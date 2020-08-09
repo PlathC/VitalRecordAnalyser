@@ -24,9 +24,9 @@ namespace DatasetBuilder
         explicit ImageSet(const std::string& path, const std::vector<cv::Mat>& images, const std::string& outputFolder = "");
 
         DatasetImage& CurrentImage();
-        int Skip(bool save);
+        std::size_t Skip(bool save);
 
-        [[nodiscard]] uint16_t Size() const;
+        [[nodiscard]] std::size_t Size() const;
         [[nodiscard]] const fs::path& SourceImage() const;
         [[nodiscard]] const std::string& ImageSet::OutputFolder() const;
         void SetOutputFolder(const std::string& folder);

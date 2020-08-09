@@ -28,8 +28,7 @@ namespace DatasetBuilder
     public:
         explicit ImageSegmenterDialog(QString imgPath, QWidget* parent = nullptr);
 
-        [[nodiscard]] std::vector<cv::Mat> GetImages();
-
+        std::vector<std::vector<cv::Mat>> GetParagraphs();
 
         ~ImageSegmenterDialog() override;
 
@@ -44,7 +43,7 @@ namespace DatasetBuilder
 
         std::string m_path;
 
-        std::vector<cv::Mat> m_images;
+        std::vector<std::vector<cv::Mat>> m_paragraphs;
         QTimer* m_progressTimer = nullptr;
     };
 }

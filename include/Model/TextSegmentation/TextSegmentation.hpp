@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 class TextSegmentation
 {
 public:
-    TextSegmentation(const std::string& src);
+    explicit TextSegmentation(const std::string& src);
 
     TextSegmentation(const TextSegmentation&) = delete;
     TextSegmentation& operator=(const TextSegmentation&) = delete;
@@ -36,14 +36,14 @@ public:
     void Join();
     uint8_t Progress();
     void Process();
-    std::vector<cv::Mat> GetExtractedWords();
+    std::vector<std::vector<cv::Mat>> GetExtractedWords();
     std::vector<cv::Mat> ExtractWords(const cv::Mat& src);
 
 private:
     uint8_t m_progress = 0;
     std::mutex m_progressLocker;
 
-    std::vector<cv::Mat> m_processedImages;
+    std::vector<std::vector<cv::Mat>> m_extractedWords;
     std::mutex m_imagesLock;
 
     std::thread m_thread;

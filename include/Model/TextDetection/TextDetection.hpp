@@ -24,7 +24,7 @@ class TextDetection
 public:
     TextDetection();
     std::string Process(const cv::Mat& src);
-    std::vector<std::string> Correct(const std::string& text);
+    std::string Correct(const std::string& text);
     std::map<std::string, std::string> AnalyseText(const std::string& text);
 
 private:

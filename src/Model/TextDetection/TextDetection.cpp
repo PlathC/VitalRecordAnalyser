@@ -42,24 +42,16 @@ std::string TextDetection::Process(const cv::Mat& src)
 }
 
 
-std::vector<std::string> TextDetection::Correct(const std::string &text)
+std::string TextDetection::Correct(const std::string& paragraph)
 {
     try
     {
-        py::object result = textCorrection.attr("paragraphize")(text);
-        auto resultParagraphs = result.cast<std::vector<std::string>>();
-        for(auto& str : resultParagraphs)
-        {
-            resultParagraphs.emplace_back(textCorrection.attr("correct_sentence")(str).cast<std::string>());
-        }
-
-        auto output = result.cast<std::vector<std::string>>();
-        return output;
+        return textCorrection.attr("correct_sentence")(paragraph).cast<std::string>();
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
-        return {};
+        return "";
     }
 }
 

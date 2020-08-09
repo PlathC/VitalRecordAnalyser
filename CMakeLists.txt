@@ -139,6 +139,8 @@ if(WIN32)
     get_filename_component(QT5_WINDEPLOYQT_EXECUTABLE ${QT5_QMAKE_EXECUTABLE} PATH)
     set(QT5_WINDEPLOYQT_EXECUTABLE "${QT5_WINDEPLOYQT_EXECUTABLE}/windeployqt.exe")
 
-    add_custom_target(QtDeploy
+    add_custom_target(QtDeployAnalyzer
             COMMAND ${QT5_WINDEPLOYQT_EXECUTABLE} --qmldir ${CMAKE_SOURCE_DIR} $<TARGET_FILE:CivilRegistryAnalyzer>)
+    add_custom_target(QtDeployBuilder
+            COMMAND ${QT5_WINDEPLOYQT_EXECUTABLE} --qmldir ${CMAKE_SOURCE_DIR} $<TARGET_FILE:DatasetBuilder>)
 endif()

@@ -54,7 +54,8 @@ namespace DatasetBuilder
         if(progress == 100)
         {
             segmentor->Join();
-            m_images = segmentor->GetExtractedWords();
+            m_paragraphs = segmentor->GetExtractedWords();
+
             m_progressTimer->stop();
             ui->m_buttonBox->setDisabled(false);
             ui->m_lblTaskInformation->setText("Task done !");
@@ -66,9 +67,9 @@ namespace DatasetBuilder
         }
     }
 
-    std::vector<cv::Mat> ImageSegmenterDialog::GetImages()
+    std::vector<std::vector<cv::Mat>> ImageSegmenterDialog::GetParagraphs()
     {
-        return m_images;
+        return m_paragraphs;
     }
 
     ImageSegmenterDialog::~ImageSegmenterDialog()

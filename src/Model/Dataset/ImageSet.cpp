@@ -50,7 +50,7 @@ namespace DatasetBuilder{
         return m_images.top();
     }
 
-    int ImageSet::Skip(bool save)
+    std::size_t ImageSet::Skip(bool save)
     {
         auto& top = m_images.top();
         if(save)
@@ -73,7 +73,7 @@ namespace DatasetBuilder{
         return m_images.size();
     }
 
-    uint16_t ImageSet::Size() const
+    std::size_t ImageSet::Size() const
     {
         return m_images.size();
     }
