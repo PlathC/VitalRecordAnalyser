@@ -85,9 +85,8 @@ void TextSegmentation::Process()
     cv::Mat contourImg;
     m_src.copyTo(contourImg);
     std::vector<cv::Mat> detectedArea;
-    for(size_t i = 0; i < contours.size(); i++)
+    for(const auto& currentContour : contours)
     {
-        auto& currentContour = contours[i];
         if(currentContour.empty())
             continue;
 
@@ -107,7 +106,6 @@ void TextSegmentation::Process()
     m_progress = 20;
     m_progressLocker.unlock();
 
-    int i = 0;
     detectedArea.erase(std::remove_if(detectedArea.begin(), detectedArea.end(), [](const auto& img ) -> bool
     {
         return (img.cols * 2) < img.rows;
@@ -135,59 +133,62 @@ void TextSegmentation::Process()
 
 std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
 {
-    // START Step 1: crop //
-    std::unique_ptr<Scanner> scanner = std::make_unique<Scanner>();
+    // Crop
     cv::Mat imageCropped;
-    scanner->process(src, imageCropped);
-    // END Step 1 //
+    {
+        Scanner scanner{};
+        scanner.process(src, imageCropped);
+    }
 
-    // START Step 1.1: resize and definitions //
+    // Resize and definitions
     int newW = 1280;
     int newH = ((newW * imageCropped.rows) / imageCropped.cols);
     cv::resize(imageCropped, imageCropped, cv::Size(newW, newH));
 
     int chunksNumber = 8;
     int chunksProcess = 4;
-    // END Step 1.1 //
 
-    // START Step 2: binarization //
-    std::unique_ptr<Binarization> threshold = std::make_unique<Binarization>();
+    // Binarization
     cv::Mat imageBinary;
+    {
+        Binarization threshold{};
 
-    // default = 0 | otsu = 1 | niblack = 2 | sauvola = 3 | wolf = 4 //
-    threshold->binarize(imageCropped, imageBinary, false, 0);
-    // END Step 2 //
+        // default = 0 | otsu = 1 | niblack = 2 | sauvola = 3 | wolf = 4 //
+        threshold.binarize(imageCropped, imageBinary, false, 0);
+    }
 
-    // START Step 3: line segmentation //
-    std::unique_ptr<LineSegmentation> line = std::make_unique<LineSegmentation>();
+    // Line segmentation //
     std::vector<cv::Mat> lines;
     cv::Mat imageLines = imageBinary.clone();
-    line->segment(imageLines, lines, chunksNumber, chunksProcess);
-    // END Step 3 //
+    {
+        LineSegmentation line{};
+        line.segment(imageLines, lines, chunksNumber, chunksProcess);
+    }
 
     // START Step 4: word segmentation //
-    std::unique_ptr<WordSegmentation> word = std::make_unique<WordSegmentation>();
     std::vector<cv::Mat> summary;
     std::vector<cv::Mat> wordsSave;
-    word->setKernel(11, 5, 1);
+    {
+        WordSegmentation word{};
+        word.setKernel(11, 5, 1);
 
-    for (int i=0; i<lines.size(); i++) {
-        std::string lineIndex = std::to_string((i+1)*1e-6).substr(5);
+        for (int i=0; i<lines.size(); i++) {
+            std::string lineIndex = std::to_string((i+1)*1e-6).substr(5);
 
-        std::vector<cv::Mat> words;
-        word->segment(lines[i], words);
+            std::vector<cv::Mat> words;
+            word.segment(lines[i], words);
 
-        summary.push_back(words[0]);
-        words.erase(words.begin());
+            summary.push_back(words[0]);
+            words.erase(words.begin());
 
-        words.erase(std::remove_if(words.begin(), words.end(), [](const auto& img ) -> bool
-        {
-            return img.cols < 100;
-        }), words.end());
+            words.erase(std::remove_if(words.begin(), words.end(), [](const auto& img ) -> bool
+            {
+                return img.cols < 100;
+            }), words.end());
 
-        for (const auto & currentWord : words)
-            wordsSave.push_back(currentWord);
-
+            for (const auto& currentWord : words)
+                wordsSave.push_back(currentWord);
+        }
     }
 
     return wordsSave;

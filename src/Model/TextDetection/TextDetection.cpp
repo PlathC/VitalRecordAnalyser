@@ -36,7 +36,7 @@ std::string TextDetection::Process(const cv::Mat& src)
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what();
+        std::cerr << e.what() << std::endl;
         return "";
     }
 }
@@ -58,7 +58,7 @@ std::vector<std::string> TextDetection::Correct(const std::string &text)
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what();
+        std::cerr << e.what() << std::endl;
         return {};
     }
 }
@@ -72,7 +72,7 @@ std::map<std::string, std::string> TextDetection::AnalyseText(const std::string&
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what();
+        std::cerr << e.what() << std::endl;
         return {};
     }
 }
