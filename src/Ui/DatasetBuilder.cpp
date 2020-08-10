@@ -12,6 +12,8 @@ namespace DatasetBuilder
             ui(new Ui::DatasetBuilder)
     {
         ui->setupUi(this);
+        ui->m_lblImg->setMinimumSize(1, 1);
+
         QObject::connect(ui->m_acInputFolders,
                 &QAction::triggered,
                 [&](){ SelectInputsImages(); }
@@ -27,39 +29,9 @@ namespace DatasetBuilder
     {
         if(m_currentImg)
         {
-            auto img = m_currentImg->Image();
-            cv::Mat nImg;
-            int width  = img.cols,
-                height = img.rows;
-
-            int target_width = ui->m_lblImg->width();
-            cv::Mat square   = cv::Mat::zeros( target_width, target_width, img.type() );
-
-            int max_dim = ( width >= height ) ? width : height;
-            float scale = ( ( float ) target_width ) / max_dim;
-            cv::Rect roi;
-            if ( width >= height )
-            {
-                roi.width = target_width;
-                roi.x = 0;
-                roi.height = height * scale;
-                roi.y = ( target_width - roi.height ) / 2;
-            }
-            else
-            {
-                roi.y = 0;
-                roi.height = target_width;
-                roi.width = width * scale;
-                roi.x = ( target_width - roi.width ) / 2;
-            }
-
-            cv::resize( img, square( roi ), roi.size());
-
             ui->m_lblImg->setPixmap(
-                    QPixmap::fromImage(
-                            ImageUtil::CvMatToQImage(square)
-                            )
-                    );
+                    m_pixmapSrc.scaled(ui->m_lblImg->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
+            );
         }
         else
         {
@@ -114,6 +86,7 @@ namespace DatasetBuilder
                 m_currentSet->SetOutputFolder(m_outputFolder);
                 m_currentSet->SetTranscriptionPath(m_transcriptionPath);
                 m_currentImg = &m_currentSet->CurrentImage();
+                m_pixmapSrc = QPixmap::fromImage(ImageUtil::CvMatToQImage(m_currentImg->Image()));
             }
 
             UpdateUi();
@@ -153,6 +126,12 @@ namespace DatasetBuilder
             m_currentSet->SetOutputFolder(m_outputFolder);
             m_currentSet->SetTranscriptionPath(m_transcriptionPath);
         }
+    }
+
+    void DatasetBuilder::resizeEvent(QResizeEvent* event)
+    {
+        QMainWindow::resizeEvent(event);
+        UpdateUi();
     }
 
     void DatasetBuilder::SkipCurrentImage()
@@ -195,16 +174,19 @@ namespace DatasetBuilder
                     m_currentSet->SetOutputFolder(m_outputFolder);
                     m_currentSet->SetTranscriptionPath(m_transcriptionPath);
                     m_currentImg = &m_currentSet->CurrentImage();
+                    m_pixmapSrc = QPixmap::fromImage(ImageUtil::CvMatToQImage(m_currentImg->Image()));
                 }
                 else
                 {
                     m_currentSet = nullptr;
                     m_currentImg = nullptr;
+                    m_pixmapSrc = QPixmap();
                 }
             }
             else
             {
                 m_currentImg = &m_currentSet->CurrentImage();
+                m_pixmapSrc = QPixmap::fromImage(ImageUtil::CvMatToQImage(m_currentImg->Image()));
             }
             UpdateUi();
         }

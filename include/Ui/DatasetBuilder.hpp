@@ -37,6 +37,8 @@ namespace DatasetBuilder
         void SelectInputsImages();
         void SelectOutputFolder();
 
+        void resizeEvent(QResizeEvent* event) override;
+
         ~DatasetBuilder() override;
 
     private slots:
@@ -51,6 +53,7 @@ namespace DatasetBuilder
         Ui::DatasetBuilder *ui;
         std::vector<ImageSet> m_sets;
         DatasetImage* m_currentImg = nullptr;
+        QPixmap m_pixmapSrc;
         ImageSet* m_currentSet = nullptr;
 
         bool m_outputFolderSelected = false;
