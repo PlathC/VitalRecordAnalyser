@@ -89,10 +89,9 @@ namespace CivilRegistryAnalyzer
         void finish();
 
     private:
-        /* See
-           https://github.com/pybind/pybind11/issues/1723#issuecomment-475226782
-           https://github.com/pybind/pybind11/issues/1273#issuecomment-366449829
-        */
+        // See :
+        // https://github.com/pybind/pybind11/issues/1723#issuecomment-475226782
+        // https://github.com/pybind/pybind11/issues/1273#issuecomment-366449829
         pybind11::gil_scoped_release guard{};
         std::vector<std::vector<cv::Mat>> m_paragraphs;
     };
