@@ -175,9 +175,6 @@ namespace CivilRegistryAnalyzer
             QObject::connect(workerThread, &TextDetectionThread::onNewAnalysis,
                              this, &CivilRegistryAnalyzer::onNewAnalysis);
 
-            QObject::connect(workerThread, &TextDetectionThread::finish,
-                             this, &CivilRegistryAnalyzer::extractTextFinished);
-
             QObject::connect(workerThread, &QThread::finished,
                              workerThread, &QObject::deleteLater);
 
