@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Segmentation running</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="m_lblTaskInformation">
      <property name="text">
-      <string>The task is running, see progress :</string>
+      <string>Extraction of the paragraphs, lines and words of the image...</string>
      </property>
     </widget>
    </item>
@@ -34,7 +34,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>

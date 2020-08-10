@@ -12,9 +12,15 @@ namespace CivilRegistryAnalyzer
         ui(new Ui::CivilRegistryAnalyzer)
     {
         ui->setupUi(this);
-        QObject::connect(ui->m_acOpenImage,
-                         &QAction::triggered,
+        ui->m_lblImg->setMinimumSize(1, 1);
+
+        QObject::connect(ui->m_pbOpenImage,
+                         &QPushButton::clicked,
                          [&](){ OpenImage(); }
+        );
+        QObject::connect(ui->m_pbLaunchAnalysis,
+                         &QPushButton::clicked,
+                         [&](){ ExtractText(); }
         );
     }
 
@@ -22,39 +28,11 @@ namespace CivilRegistryAnalyzer
     {
         if(!m_src.empty())
         {
-            cv::Mat nImg;
-            int width  = m_src.cols,
-                height = m_src.rows;
-
-            int target_width = ui->m_lblImg->width();
-            cv::Mat square   = cv::Mat::zeros( target_width, target_width, m_src.type() );
-
-            int max_dim = ( width >= height ) ? width : height;
-            float scale = ( ( float ) target_width ) / max_dim;
-            cv::Rect roi;
-            if ( width >= height )
-            {
-                roi.width = target_width;
-                roi.x = 0;
-                roi.height = height * scale;
-                roi.y = ( target_width - roi.height ) / 2;
-            }
-            else
-            {
-                roi.y = 0;
-                roi.height = target_width;
-                roi.width = width * scale;
-                roi.x = ( target_width - roi.width ) / 2;
-            }
-
-            cv::resize( m_src, square( roi ), roi.size());
-
             ui->m_lblImg->setPixmap(
-                    QPixmap::fromImage(
-                            ImageUtil::CvMatToQImage(square)
-                    )
+                    m_pixmapSrc.scaled(ui->m_lblImg->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation)
             );
         }
+
         if(!m_extractedText.empty())
         {
             QString detectedText = "";
@@ -65,6 +43,7 @@ namespace CivilRegistryAnalyzer
             QString txt = ui->m_ptDetectedText->toPlainText();
             ui->m_ptDetectedText->clear();
             ui->m_ptDetectedText->setPlainText(detectedText);
+            ui->m_ptDetectedText->moveCursor (QTextCursor::End);
         }
         else
         {
@@ -86,7 +65,7 @@ namespace CivilRegistryAnalyzer
 
     void CivilRegistryAnalyzer::extractTextFinished()
     {
-        ui->m_pbDetectWords->setEnabled(true);
+        ui->m_pbLaunchAnalysis->setEnabled(true);
         QMessageBox::information(this, "Information", "The analysis is done, you can find"
                                                       " the outputCsv.csv at the root path of this program.");
 
@@ -143,6 +122,7 @@ namespace CivilRegistryAnalyzer
 
             std::string file = dialog->selectedFiles()[0].toStdString();
             m_src = cv::imread(file);
+            m_pixmapSrc = QPixmap::fromImage(ImageUtil::CvMatToQImage(m_src));
             UpdateUi();
 
             auto *segmenterDialog = new DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file), this);
@@ -160,7 +140,7 @@ namespace CivilRegistryAnalyzer
                         }
                     }
                 }
-                ui->m_pbDetectWords->setEnabled(true);
+                ui->m_pbLaunchAnalysis->setEnabled(true);
                 UpdateUi();
             }
         }
@@ -170,12 +150,22 @@ namespace CivilRegistryAnalyzer
     {
         if(!m_paragraphsFragments.empty())
         {
+            ui->m_pbLaunchAnalysis->setEnabled(false);
+
             auto* workerThread = new TextDetectionThread(m_paragraphsFragments);
 
             qRegisterMetaType<std::vector<std::string> >("std::vector<std::string>");
             qRegisterMetaType<std::map<std::string, std::string>>("std::map<std::string, std::string>");
 
             // Connect our signal and slot
+            QObject::connect(workerThread, &TextDetectionThread::onNewOutput,
+                             this, [&](QString content){
+                        ui->m_tePromptOutput->moveCursor (QTextCursor::End);
+                        ui->m_tePromptOutput->insertPlainText(content);
+                        ui->m_tePromptOutput->moveCursor (QTextCursor::End);
+
+                    });
+
             QObject::connect(workerThread, &TextDetectionThread::progressChanged,
                              this, &CivilRegistryAnalyzer::onProgressChanged);
 
@@ -193,8 +183,6 @@ namespace CivilRegistryAnalyzer
 
             QObject::connect(workerThread, &QThread::finished,
                         this, &CivilRegistryAnalyzer::extractTextFinished);
-
-            ui->m_pbDetectWords->setEnabled(false);
 
             workerThread->start();
         }

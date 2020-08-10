@@ -4,6 +4,8 @@ import h5py
 import os
 import string
 import datetime
+import sys
+import logging
 
 from numba import cuda
 
@@ -15,6 +17,14 @@ from data.reader import Dataset
 from kaldiio import WriteHelper
 from network.model import HTRModel
 
+log = logging.getLogger('tensorflow')
+log.setLevel(logging.DEBUG)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+log.addHandler(handler)
 
 def limit_gpu_memory(gpu_index=0, memory_limit=1024):
     gpus = tf.config.experimental.list_physical_devices('GPU')

@@ -11,7 +11,7 @@ namespace DatasetBuilder
             ".jpg", ".jpeg", ".png"
     };
 
-    ImageSegmenterDialog::ImageSegmenterDialog(QString imgPath, QWidget* parent):
+    ImageSegmenterDialog::ImageSegmenterDialog(const QString& imgPath, QWidget* parent):
             QDialog(parent),
             ui(new Ui::ImageSegmenterDialog),
             m_path(imgPath.toStdString())
@@ -39,7 +39,7 @@ namespace DatasetBuilder
                 ui->m_pbTask->setValue(0);
                 QObject::connect(m_progressTimer, &QTimer::timeout, this, &ImageSegmenterDialog::UpdateProgress);
                 m_progressTimer->setSingleShot(false);
-                //nTimer->setInterval(100);
+
                 m_progressTimer->start(100);
                 segmentor->Start();
             }

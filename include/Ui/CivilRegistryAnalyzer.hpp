@@ -7,7 +7,9 @@
 
 #include <fstream>
 #include <map>
+#include <utility>
 
+#include <QCoreApplication>
 #include <QFileDialog>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -21,6 +23,7 @@
 
 #include "Model/ImageUtil.hpp"
 #include "Ui/ImageSegmenterDialog.hpp"
+#include "Ui/PyOutputRedirector.hpp"
 
 namespace Ui
 {
@@ -39,13 +42,23 @@ namespace CivilRegistryAnalyzer
     {
         Q_OBJECT
     public:
-        explicit TextDetectionThread(const std::vector<std::vector<cv::Mat>>& paragraphs) :
+        explicit TextDetectionThread(const std::vector<std::vector<cv::Mat>>& paragraphs):
                 m_paragraphs(paragraphs)
         {}
 
         void run() override
         {
             pybind11::gil_scoped_acquire acquire;
+
+            CivilRegistryAnalyser::PyOutputRedirector redirector{};
+
+            auto callback = [&](QString content){
+                emit onNewOutput(content);
+            };
+
+            QObject::connect(&redirector, &CivilRegistryAnalyser::PyOutputRedirector::newStdOutContent, callback);
+            QObject::connect(&redirector, &CivilRegistryAnalyser::PyOutputRedirector::newStdErrContent, callback);
+
             std::vector<std::string> paragraphsResults;
             std::string completeResult;
             TextDetection textDetection;
@@ -67,12 +80,17 @@ namespace CivilRegistryAnalyzer
                     completeResult.clear();
                 }
             }
+            emit onNewOutput("--INFO-- End of detection");
+            emit onNewOutput("--INFO-- Start correction");
 
             for(auto& paragraph : paragraphsResults)
             {
                 paragraph = textDetection.Correct(paragraph);
             }
             emit onNewCorrectedText(paragraphsResults);
+
+            emit onNewOutput("--INFO-- End of correction");
+            emit onNewOutput("--INFO-- Start analysis");
 
             for(auto& paragraph: paragraphsResults)
             {
@@ -83,6 +101,7 @@ namespace CivilRegistryAnalyzer
             emit finish();
         }
     signals:
+        void onNewOutput(QString);
         void progressChanged(QString newExtractedText);
         void onNewCorrectedText(std::vector<std::string> newExtractedText);
         void onNewAnalysis(std::map<std::string, std::string> newAnalysis);
@@ -122,6 +141,7 @@ namespace CivilRegistryAnalyzer
     private:
         Ui::CivilRegistryAnalyzer* ui;
         cv::Mat m_src;
+        QPixmap m_pixmapSrc;
         std::vector<std::vector<cv::Mat>> m_paragraphsFragments;
         std::vector<std::string> m_extractedText;
 
