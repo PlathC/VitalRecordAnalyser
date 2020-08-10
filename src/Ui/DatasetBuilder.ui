@@ -81,14 +81,14 @@ QMenu::item:selected {
        <item>
         <widget class="QListWidget" name="m_lwRemainingFolders">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>285</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>

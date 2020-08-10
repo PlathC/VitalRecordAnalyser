@@ -20,6 +20,8 @@ algorithms.
 - Text recognition on fragmented images
 - Text features extractions with NLP.
 
+![CivilRegistryAnalyzer](images/scCivilRegistryAnalyzer.png)
+
 ## Assets
 
 For any other dataset than the one created using the DatasetBuilder you can follow this [tutorial](https://github.com/arthurflor23/handwritten-text-recognition/blob/master/src/tutorial.ipynb) 
