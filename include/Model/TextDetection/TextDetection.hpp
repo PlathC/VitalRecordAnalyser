@@ -28,9 +28,12 @@ public:
     std::map<std::string, std::string> AnalyseText(const std::string& text);
 
 private:
-    py::module textDetection;
-    py::module textCorrection;
-    py::module textAnalyser;
+    py::module m_textDetection;
+    py::module m_textCorrection;
+    py::module m_textAnalyser;
+
+    py::object m_nlp;
+    py::object m_textRecognizer;
 };
 
 

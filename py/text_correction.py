@@ -1,5 +1,6 @@
 from spellchecker import SpellChecker
 
+
 def correct_sentence(sentence):
     speller = SpellChecker(language='fr')
 

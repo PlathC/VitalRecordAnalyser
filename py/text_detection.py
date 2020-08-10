@@ -15,53 +15,59 @@ from data.reader import Dataset
 from kaldiio import WriteHelper
 from network.model import HTRModel
 
-tokenizer = None
-model = None
-input_size = (1024, 128, 1)
-max_text_length = 128
-charset_base = string.printable[:95]
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-    # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
-    try:
-        tf.config.experimental.set_virtual_device_configuration(
-            gpus[0],
-            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
-        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-    except RuntimeError as e:
-        # Virtual devices must be set before GPUs have been initialized
-        print(e)
+def limit_gpu_memory(gpu_index=0, memory_limit=1024):
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        # Restrict TensorFlow to only allocate memory_limit (MB) of memory on the first GPU
+        try:
+            tf.config.experimental.set_virtual_device_configuration(
+                gpus[gpu_index],
+                [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=memory_limit)])
+            logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        except RuntimeError as e:
+            # Virtual devices must be set before GPUs have been initialized
+            print(e)
 
 
-def read_all_text_from_images(imgs):
-    output = []
-    for img in imgs:
-        output.append(read_text_from_image(img))
+class TextRecognizer:
 
-    return output
+    def __init__(self, checkpoint_path="./py/checkpoint_weights.hdf5", input_size=(1024, 128, 1), max_text_length=128, charset_base=string.printable[:95], architecture="flor"):
+        self.tokenizer = None
+        self.model = None
+        self.checkpoint_path = checkpoint_path
+        self.input_size = input_size
+        self.max_text_length = max_text_length
+        self.charset_base = charset_base
+        self.architecture = architecture
+        limit_gpu_memory()
 
+        self.load_model()
 
-def load_model():
-    global model, tokenizer, charset_base, max_text_length
-    tokenizer = Tokenizer(chars=charset_base, max_text_length=max_text_length)
-    model = HTRModel(architecture="flor",
-                     input_size=input_size,
-                     vocab_size=tokenizer.vocab_size,
-                     top_paths=10)
-    model.compile()
-    model.load_checkpoint(target="./py/checkpoint_weights.hdf5")
+    def load_model(self):
+        self.tokenizer = Tokenizer(chars=self.charset_base, max_text_length=self.max_text_length)
+        self.model = HTRModel(architecture=self.architecture,
+                              input_size=self.input_size,
+                              vocab_size=self.tokenizer.vocab_size,
+                              top_paths=10)
+        self.model.compile()
+        self.model.load_checkpoint(target=self.checkpoint_path)
 
+    def read_all_text_from_images(self, images):
+        output = []
+        for img in images:
+            output.append(self.read_text_from_image(img))
 
-def read_text_from_image(img):
-    global model, tokenizer, input_size
+        return output
 
-    img = pp.preprocess(img, input_size=input_size)
-    x_test = pp.normalization([img])
+    def read_text_from_image(self, img):
+        img = pp.preprocess(img, input_size=self.input_size)
+        x_test = pp.normalization([img])
 
-    predicts, probabilities = model.predict(x_test, ctc_decode=True)
-    predicts = [[tokenizer.decode(x) for x in y] for y in predicts]
+        predicts, probabilities = self.model.predict(x_test, ctc_decode=True)
+        predicts = [[self.tokenizer.decode(x) for x in y] for y in predicts]
 
-    for i, (pred, prob) in enumerate(zip(predicts, probabilities)):
-        return pred[0]
+        for i, (pred, prob) in enumerate(zip(predicts, probabilities)):
+            return pred[0]
+
+        return ""

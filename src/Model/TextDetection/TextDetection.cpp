@@ -13,12 +13,15 @@ TextDetection::TextDetection()
             sys.path.insert(0,'py')
         )");
 
-        textDetection = py::module::import("text_detection");
-        textCorrection = py::module::import("text_correction");
+        m_textDetection = py::module::import("text_detection");
+        m_textCorrection = py::module::import("text_correction");
+        m_textAnalyser = py::module::import("nlp");
 
-        textAnalyser = py::module::import("nlp");
-        textDetection.attr("load_model")();
-        textAnalyser.attr("init_nlp_module")();
+        assert(py::hasattr(m_textDetection, "TextRecognizer"));
+        assert(py::hasattr(m_textAnalyser, "init_nlp_module"));
+
+        m_textRecognizer = m_textDetection.attr("TextRecognizer")();
+        m_nlp = m_textAnalyser.attr("init_nlp_module")();
     }
     catch(const std::exception& e)
     {
@@ -28,9 +31,10 @@ TextDetection::TextDetection()
 
 std::string TextDetection::Process(const cv::Mat& src)
 {
+    assert(py::hasattr(m_textRecognizer, "read_text_from_image"));
     try
     {
-        py::object result = textDetection.attr("read_text_from_image")(src);
+        py::object result = m_textRecognizer.attr("read_text_from_image")(src);
         auto output = result.cast<std::string>();
         return output;
     }
@@ -44,9 +48,10 @@ std::string TextDetection::Process(const cv::Mat& src)
 
 std::string TextDetection::Correct(const std::string& paragraph)
 {
+    assert(py::hasattr(m_textCorrection, "correct_sentence"));
     try
     {
-        return textCorrection.attr("correct_sentence")(paragraph).cast<std::string>();
+        return m_textCorrection.attr("correct_sentence")(paragraph).cast<std::string>();
     }
     catch(const std::exception& e)
     {
@@ -57,9 +62,10 @@ std::string TextDetection::Correct(const std::string& paragraph)
 
 std::map<std::string, std::string> TextDetection::AnalyseText(const std::string& text)
 {
+    assert(py::hasattr(m_textAnalyser, "process_text"));
     try
     {
-        py::object result = textAnalyser.attr("process_text")(text);
+        py::object result = m_textAnalyser.attr("process_text")(m_nlp, text);
         return result.cast<std::map<std::string, std::string>>();
     }
     catch(const std::exception& e)
