@@ -6,12 +6,63 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1040</width>
+    <width>1049</width>
     <height>763</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>DatasetBuilder</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#centralwidget
+{
+	background-color:#121212
+}
+
+QWidget
+{
+	font: &quot;Segoe UI&quot;;
+}
+
+QMainWindow
+{
+	background-color:#121212
+}
+
+QPushButton
+{
+	background-color:#ffffff;
+	border-style: outset;
+	border-width: 2px;
+    border-radius: 3px;
+	border-color:  #ffffff;
+	font: bold;
+	padding: 0.2em;
+}
+
+QPushButton:pressed
+{
+	background-color:#ccccccc;
+}
+
+QMenuBar {
+    background-color: #272727;
+    color: #ffffff;
+}
+
+QMenuBar::item:selected {
+    background: #101010;
+}
+
+QMenu {
+    background-color: #272727;
+    color: #ffffff;
+}
+
+QMenu::item:selected {
+    background-color: #151515;
+    color: #ffffff;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -28,26 +79,23 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QListWidget
+{
+	background-color: #242424;
+	color: #ffffff;
+}</string>
+        </property>
        </widget>
       </item>
      </layout>
     </item>
     <item>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="sizeConstraint">
        <enum>QLayout::SetMaximumSize</enum>
       </property>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="m_pbSkip">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Skip</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
+      <item>
        <widget class="QLabel" name="m_lblImg">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -61,45 +109,150 @@
           <height>0</height>
          </size>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QLabel
+{
+	color: #ffffff;
+	font: 20px bold;
+}</string>
+        </property>
         <property name="text">
          <string>No image yet</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2"/>
       </item>
      </layout>
     </item>
     <item>
-     <layout class="QGridLayout" name="m_laySave">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetFixedSize</enum>
+     <widget class="QWidget" name="m_buttonWidget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="m_leTextImg">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="m_pbSave">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Save</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+      <property name="styleSheet">
+       <string notr="true">QWidget#m_buttonWidget
+{
+	background-color:#272727
+}</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetFixedSize</enum>
+       </property>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="m_textFiledTitle">
+         <property name="styleSheet">
+          <string notr="true">QLabel
+{
+	color: #ffffff;
+	font: 12px bold;
+}</string>
+         </property>
+         <property name="text">
+          <string>Enter translation:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="m_leTextImg">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>29</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_pbSkip">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Skip</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_pbSave">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Save</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -108,7 +261,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1040</width>
+     <width>1049</width>
      <height>21</height>
     </rect>
    </property>
@@ -142,8 +295,8 @@
    <slot>SkipCurrentImage()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>307</x>
-     <y>562</y>
+     <x>1038</x>
+     <y>419</y>
     </hint>
     <hint type="destinationlabel">
      <x>318</x>
@@ -158,12 +311,12 @@
    <slot>Save()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>720</x>
-     <y>564</y>
+     <x>981</x>
+     <y>439</y>
     </hint>
     <hint type="destinationlabel">
-     <x>707</x>
-     <y>637</y>
+     <x>531</x>
+     <y>734</y>
     </hint>
    </hints>
   </connection>

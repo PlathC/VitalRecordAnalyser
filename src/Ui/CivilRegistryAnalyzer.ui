@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>982</width>
+    <width>855</width>
     <height>733</height>
    </rect>
   </property>
@@ -33,7 +33,24 @@ QWidget
 QMainWindow
 {
 	background-color:#121212
-}</string>
+}
+
+QPushButton
+{
+	background-color:#ffffff;
+	border-style: outset;
+	border-width: 2px;
+    border-radius: 3px;
+	border-color:  #ffffff;
+	font: bold;
+	padding: 0.2em;
+}
+
+QPushButton:pressed
+{
+	background-color: #909090;
+}
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="layoutDirection">
@@ -125,17 +142,7 @@ QMainWindow
 {
 	background-color:#272727
 }
-
-QPushButton
-{
-	background-color:#ffffff;
-	border-style: outset;
-	border-width: 2px;
-    border-radius: 3px;
-	border-color:  #ffffff;
-	font: bold;
-	padding: 0.2em;
-}</string>
+</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="1" column="1">
