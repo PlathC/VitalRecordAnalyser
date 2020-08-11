@@ -82,8 +82,6 @@ void TextSegmentation::Process()
     for(int i = 0; i < contours.size(); i++)
         cv::drawContours( fullContourImg, contours, i, cv::Scalar(0, 0, 0), 2, 8, hierarchy, 0, cv::Point() );
 
-    cv::Mat contourImg;
-    m_src.copyTo(contourImg);
     std::vector<cv::Mat> detectedArea;
     for(const auto& currentContour : contours)
     {
@@ -95,10 +93,6 @@ void TextSegmentation::Process()
 
         cv::Rect box = cv::boundingRect(currentContour);
         cv::Mat out = m_src(box);
-        cv::rectangle(contourImg,
-                cv::Point(box.x, box.y),
-                cv::Point( box.x + box.width, box.y + box.height),
-                cv::Scalar(0, 255, 0), 4),
         detectedArea.push_back(out);
     }
 

@@ -7,7 +7,7 @@
 
 Binarization::Binarization() {};
 
-void Binarization::binarize(cv::Mat image, cv::Mat &output, bool light, int option)
+void Binarization::binarize(const cv::Mat& image, cv::Mat &output, bool light, int option)
 {
     cv::Mat grayscale;
     cv::cvtColor(image, grayscale, cv::COLOR_BGR2GRAY);
@@ -211,7 +211,8 @@ double Binarization::calcLocalStats(cv::Mat &im, cv::Mat &mapM, cv::Mat &mapS, i
         *mapMData++ = m;
         *mapSData++ = s;
 
-        for	(int i=1 ; i<=im.cols-winx; i++) {
+        for	(int i=1 ; i<=im.cols-winx; i++)
+        {
             sumTopLeft++, sumTopRight++, sumBottomLeft++, sumBottomRight++;
 
             sumEqTopLeft++, sumEqTopRight++, sumEqBottomLeft++, sumEqBottomRight++;
@@ -238,13 +239,16 @@ void Binarization::lightDistribution(cv::Mat &grayscale){
 
     cv::Mat intImg = this->cei.clone();
 
-    for (int y=0; y<intImg.cols; y++){
-        for (int x=0; x<intImg.rows; x++){
-
-            if (this->tliErosion.at<float>(x,y) == 0){
+    for (int y=0; y<intImg.cols; y++)
+    {
+        for (int x=0; x<intImg.rows; x++)
+        {
+            if (this->tliErosion.at<float>(x,y) == 0)
+            {
                 int head = x, end = x, n;
 
-                while (end < this->tliErosion.rows && this->tliErosion.at<float>(end,y) == 0){
+                while (end < this->tliErosion.rows && this->tliErosion.at<float>(end,y) == 0)
+                {
                     end++;
                 }
                 end--;
@@ -276,8 +280,10 @@ void Binarization::lightDistribution(cv::Mat &grayscale){
 
     grayscale = (this->cei/this->ldi) * 260;
 
-    for (int y=0; y<this->tliErosion.rows; y++){
-        for (int x=0; x<this->tliErosion.cols; x++){
+    for (int y=0; y<this->tliErosion.rows; y++)
+    {
+        for (int x=0; x<this->tliErosion.cols; x++)
+        {
             if (this->tliErosion.at<float>(y,x) != 0)
                 grayscale.at<float>(y,x) *= 1.5;
         }
@@ -287,7 +293,7 @@ void Binarization::lightDistribution(cv::Mat &grayscale){
     grayscale.convertTo(grayscale, CV_8U);
 }
 
-void Binarization::getHistogram(cv::Mat image){
+void Binarization::getHistogram(const cv::Mat& image){
     std::vector<cv::Mat> bgrPlanes;
     cv::split(image, bgrPlanes);
 
@@ -320,7 +326,7 @@ void Binarization::getCEI(const cv::Mat& grayscale)
     cv::threshold(this->cei, this->ceiBin, 59, 255, cv::THRESH_BINARY_INV);
 }
 
-void Binarization::getEdge(cv::Mat grayscale)
+void Binarization::getEdge(const cv::Mat& grayscale)
 {
     float m1[] = {-1,0,1,-2,0,2,-1,0,1};
     float m2[] = {-2,-1,0,-1,0,1,0,1,2};
@@ -349,7 +355,7 @@ void Binarization::getEdge(cv::Mat grayscale)
     cv::threshold(this->egAvg, this->egBin, 30, 255, cv::THRESH_BINARY);
 }
 
-void Binarization::getTLI(cv::Mat grayscale)
+void Binarization::getTLI(const cv::Mat& grayscale)
 {
     this->tli = cv::Mat::ones(cv::Size(grayscale.cols, grayscale.rows), CV_32F) * 255;
     this->tli -= this->egBin;
@@ -361,13 +367,13 @@ void Binarization::getTLI(cv::Mat grayscale)
     cv::threshold(this->tliErosion, this->tliErosion, 0, 255, cv::THRESH_BINARY);
 }
 
-cv::Mat Binarization::scale(cv::Mat image)
+cv::Mat Binarization::scale(const cv::Mat& image)
 {
     double min, max;
-    minMaxLoc(image, &min, &max);
+    cv::minMaxLoc(image, &min, &max);
 
     cv::Mat res = image / (max - min);
-    minMaxLoc(res, &min, &max);
+    cv::minMaxLoc(res, &min, &max);
     res -= min;
     res *= 255;
 
