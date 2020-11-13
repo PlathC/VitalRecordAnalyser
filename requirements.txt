@@ -4,6 +4,6 @@ flake8==3.7.9
 kaldiio==2.15.1
 numba==0.47.0
 opencv-python==4.1.2.30
-tensorflow==2.1.0
+tensorflow==2.3.1
 pyspellchecker==0.5.4
 spacy
