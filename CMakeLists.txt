@@ -34,6 +34,8 @@ set(DB_HEADERS
         "include/Model/TextSegmentation/Scanner.hpp"
         "include/Model/TextSegmentation/WordSegmentation.hpp"
         "include/Model/TextSegmentation/TextSegmentation.hpp"
+        "include/Model/TextSegmentation/ParagraphSegmentation.hpp"
+        "include/Model/TextSegmentation/Preprocessing.hpp"
         )
 
 set(DB_SOURCES
@@ -47,6 +49,8 @@ set(DB_SOURCES
         "src/Model/TextSegmentation/Scanner.cpp"
         "src/Model/TextSegmentation/WordSegmentation.cpp"
         "src/Model/TextSegmentation/TextSegmentation.cpp"
+        "src/Model/TextSegmentation/ParagraphSegmentation.cpp"
+        "src/Model/TextSegmentation/Preprocessing.cpp"
         )
 
 set(DB_UI
@@ -65,6 +69,8 @@ set(CRA_HEADERS
         "include/Model/TextSegmentation/Scanner.hpp"
         "include/Model/TextSegmentation/WordSegmentation.hpp"
         "include/Model/TextSegmentation/TextSegmentation.hpp"
+        "include/Model/TextSegmentation/ParagraphSegmentation.hpp"
+        "include/Model/TextSegmentation/Preprocessing.hpp"
         "include/Ui/PyOutputRedirector.hpp")
 
 set(CRA_SOURCES
@@ -77,7 +83,10 @@ set(CRA_SOURCES
         "src/Model/TextSegmentation/Scanner.cpp"
         "src/Model/TextSegmentation/WordSegmentation.cpp"
         "src/Model/TextSegmentation/TextSegmentation.cpp"
-        "src/Ui/PyOutputRedirector.cpp")
+        "src/Model/TextSegmentation/ParagraphSegmentation.cpp"
+        "src/Model/TextSegmentation/Preprocessing.cpp"
+        "src/Ui/PyOutputRedirector.cpp"
+        )
 
 set(CRA_UI
         "src/Ui/ImageSegmenterDialog.ui"
