@@ -36,6 +36,7 @@ set(DB_HEADERS
         "include/Model/TextSegmentation/TextSegmentation.hpp"
         "include/Model/TextSegmentation/ParagraphSegmentation.hpp"
         "include/Model/TextSegmentation/Preprocessing.hpp"
+        "include/Model/TextSegmentation/LocallySoftAdaptativeBinarization.hpp"
         )
 
 set(DB_SOURCES
@@ -51,6 +52,7 @@ set(DB_SOURCES
         "src/Model/TextSegmentation/TextSegmentation.cpp"
         "src/Model/TextSegmentation/ParagraphSegmentation.cpp"
         "src/Model/TextSegmentation/Preprocessing.cpp"
+        "src/Model/TextSegmentation/LocallySoftAdaptativeBinarization.cpp"
         )
 
 set(DB_UI
@@ -71,6 +73,7 @@ set(CRA_HEADERS
         "include/Model/TextSegmentation/TextSegmentation.hpp"
         "include/Model/TextSegmentation/ParagraphSegmentation.hpp"
         "include/Model/TextSegmentation/Preprocessing.hpp"
+        "include/Model/TextSegmentation/LocallySoftAdaptativeBinarization.hpp"
         "include/Ui/PyOutputRedirector.hpp")
 
 set(CRA_SOURCES
@@ -86,6 +89,7 @@ set(CRA_SOURCES
         "src/Model/TextSegmentation/ParagraphSegmentation.cpp"
         "src/Model/TextSegmentation/Preprocessing.cpp"
         "src/Ui/PyOutputRedirector.cpp"
+        "src/Model/TextSegmentation/LocallySoftAdaptativeBinarization.cpp"
         )
 
 set(CRA_UI

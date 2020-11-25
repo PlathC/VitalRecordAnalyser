@@ -5,22 +5,12 @@
 
 #include <opencv2/opencv.hpp>
 
-namespace segmentation
+#include "Model/TextSegmentation/LocallySoftAdaptativeBinarization.hpp"
+
+namespace preprocessing
 {
-    class Preprocessing
-    {
-    public:
-        Preprocessing();
-
-        void Perform(const std::string& fileName);
-
-    private:
-
-    };
-
-
-    static void GammaCorrection(cv::Mat& inout, float gamma=2);
-    static void LocallyAdaptiveSoftBinarisation(cv::Mat& inout);
+    cv::Mat GammaCorrection(const cv::Mat& img, float gamma=2);
+    cv::Mat ExtractBiggestFeature(const cv::Mat& img, uint16_t horizontalDilation=50);
 }
 
 #endif //CIVILREGISTRYANALYSER_PREPROCESSING_HPP
