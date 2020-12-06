@@ -6,13 +6,11 @@
 
 namespace preprocessing
 {
-    cv::Mat LocallySoftAdaptativeBinarization(const cv::Mat& img, const uint16_t blockSize)
+    cv::Mat LocallySoftAdaptiveBinarization(const cv::Mat& img, const uint16_t blockSize)
     {
         // Strongly based on https://stackoverflow.com/a/57103789/9690046
-
         cv::Mat gray = img.clone();
-        std::cout << gray.depth() << std::endl;
-        if(gray.channels() > 1)
+        if(gray.channels() == 3)
         {
             cv::cvtColor(gray, gray, cv::COLOR_BGR2GRAY);
         }
@@ -139,7 +137,7 @@ namespace preprocessing
         std::vector<uint8_t> localSelectedPixels = std::vector<uint8_t>(selectedPixels.size());
         for(int i = 0; i < localSelectedPixels.size(); i++)
         {
-            localSelectedPixels[i] = selectedPixels[i] - lowestValue;
+            localSelectedPixels[i] = static_cast<uint8_t>(selectedPixels[i] - lowestValue);
         }
 
         float range = highestValue - lowestValue;
@@ -147,7 +145,7 @@ namespace preprocessing
         // Now we use good old OTSU binarization to get a rough estimation
         // of foreground and background regions.
         //cv::Mat thresholdedBase = cv::Mat(selectedPixels, CV_8UC1);
-        cv::Mat thresholdedBase = cv::Mat( 1, selectedPixels.size(), CV_8UC1, selectedPixels.data());
+        cv::Mat thresholdedBase = cv::Mat( 1, static_cast<int>(selectedPixels.size()), CV_8UC1, selectedPixels.data());
 
         cv::Mat thresholded;
         cv::threshold(thresholdedBase, thresholded, 0, 255, cv::THRESH_BINARY + cv::THRESH_OTSU);

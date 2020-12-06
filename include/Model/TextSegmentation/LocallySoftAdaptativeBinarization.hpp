@@ -5,7 +5,7 @@
 
 namespace preprocessing
 {
-    cv::Mat LocallySoftAdaptativeBinarization(const cv::Mat& img, uint16_t blockSize=100);
+    cv::Mat LocallySoftAdaptiveBinarization(const cv::Mat& img, const uint16_t blockSize=100);
 
     cv::Mat ApplyAdaptiveMedianThreshold(const cv::Mat& inout, const uint8_t delta = 30);
 
