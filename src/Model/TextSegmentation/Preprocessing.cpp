@@ -24,21 +24,20 @@ namespace preprocessing
                                                 cv::Size(1, horizontalDilation));
         cv::dilate(blurred, blurred, element);
         element = getStructuringElement(cv::MORPH_ELLIPSE,
-                                        cv::Size(horizontalDilation, horizontalDilation));
-        cv::erode(blurred, blurred, element);
+                                        cv::Size(1, horizontalDilation));
 
-        cv::threshold(blurred, blurred, 50, 255, cv::THRESH_BINARY_INV);
+        cv::threshold(cv::Scalar(255) - blurred, blurred, 50, 255, cv::THRESH_BINARY_INV);
 
         std::vector<std::vector<cv::Point>> contours;
         std::vector<cv::Vec4i> hierarchy;
         cv::findContours(blurred, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_NONE);
 
-        std::sort(contours.begin(), contours.end(), [](std::vector<cv::Point> firstContour,
-                                                       std::vector<cv::Point> secondContour) {
+        std::sort(contours.begin(), contours.end(), [](const std::vector<cv::Point>& firstContour,
+                                                       const std::vector<cv::Point>& secondContour) {
             return cv::contourArea(firstContour) < cv::contourArea(secondContour);
         });
 
-        std::vector<cv::Point> largestContour = contours[contours.size() - 2];
+        std::vector<cv::Point> largestContour = contours[contours.size() - 1];
         double contoursArcLength = cv::arcLength(largestContour, true);
         std::vector<cv::Point> approximation;
         cv::approxPolyDP(largestContour, approximation, 0.02 * contoursArcLength, true);
