@@ -16,6 +16,8 @@ from data.generator import DataGenerator, Tokenizer
 from data.reader import Dataset
 from kaldiio import WriteHelper
 from network.model import HTRModel
+import ml_utils
+
 
 log = logging.getLogger('tensorflow')
 log.setLevel(logging.DEBUG)
@@ -25,20 +27,6 @@ handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 log.addHandler(handler)
-
-def limit_gpu_memory(gpu_index=0, memory_limit=1024):
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    if gpus:
-        # Restrict TensorFlow to only allocate memory_limit (MB) of memory on the first GPU
-        try:
-            tf.config.experimental.set_virtual_device_configuration(
-                gpus[gpu_index],
-                [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=memory_limit)])
-            logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-        except RuntimeError as e:
-            # Virtual devices must be set before GPUs have been initialized
-            print(e)
-
 
 class TextRecognizer:
 
@@ -50,7 +38,7 @@ class TextRecognizer:
         self.max_text_length = max_text_length
         self.charset_base = charset_base
         self.architecture = architecture
-        limit_gpu_memory()
+        ml_utils.limit_gpu_memory()
 
         self.load_model()
 

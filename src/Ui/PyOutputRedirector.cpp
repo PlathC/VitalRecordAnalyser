@@ -4,6 +4,8 @@
 
 #include "Ui/PyOutputRedirector.hpp"
 
+// Based on https://stackoverflow.com/a/58760061/9690046
+
 namespace CivilRegistryAnalyser
 {
     PyOutputRedirector::PyOutputRedirector()
