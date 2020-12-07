@@ -49,7 +49,6 @@ namespace segmentation {
             using Box = std::vector<Point>;
             auto finalBoxes = finalResult.cast<std::vector<Box>>();
 
-            auto ratios = std::get<2>(output);
             std::vector<cv::Rect> resultedBoudingBox{};
             resultedBoudingBox.reserve(finalBoxes.size());
             for(const auto& box : finalBoxes)

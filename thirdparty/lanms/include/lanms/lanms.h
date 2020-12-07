@@ -208,7 +208,7 @@ namespace lanms {
 			for (size_t i = 0; i < data.size(); i ++) {
 				auto p = data[i];
 				Polygon poly{
-					{
+                    cl::Path{
 						{cInt(p[0]), cInt(p[1])},
 						{cInt(p[2]), cInt(p[3])},
 						{cInt(p[4]), cInt(p[5])},

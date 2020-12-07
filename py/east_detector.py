@@ -32,7 +32,6 @@ class EastDetector:
         # sort the text boxes via the y axis
         xy_text = xy_text[np.argsort(xy_text[:, 0])]
         # restore
-        start = time.time()
         text_box_restored = restore_rectangle_rbox(xy_text[:, ::-1] * 4,
                                                    np.transpose(geo_map[:, xy_text[:, 0], xy_text[:, 1]]))  # N*4*2
 

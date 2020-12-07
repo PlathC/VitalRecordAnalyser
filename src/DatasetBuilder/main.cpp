@@ -79,8 +79,7 @@ int main(int argc, char** argv) {
 
     return EXIT_SUCCESS;
 
-    // cv::imwrite("test.png", img);
-    //QApplication app{argc, argv};
+    // QApplication app{argc, argv};
     // DatasetBuilder::DatasetBuilder w indow;
     // window.show();
 
