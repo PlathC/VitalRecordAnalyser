@@ -43,12 +43,29 @@ int main(int argc, char** argv) {
     std::cout << "Quarters = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() / 1000.
               << "[s]" << std::endl;
 
-    cv::cvtColor(img, img, cv::COLOR_GRAY2BGR);
-
     namespace py = pybind11;
     py::scoped_interpreter interpreter{};
     segmentation::EASTDetector detector{};
-    detector.Process(img);
+
+    for(const auto& quarter : quarters)
+    {
+        cv::Mat working = img(quarter).clone();
+        cv::cvtColor(working, working, cv::COLOR_GRAY2BGR);
+        auto boxes = detector.Process(working);
+        for(auto& box:boxes)
+        {
+            cv::rectangle(working, cv::Point(box.x, box.y), cv::Point(box.x + box.width, box.y + box.height),
+                          cv::Scalar(0., 0., 0.), 10);
+        }
+
+        auto visu = working.clone();
+        double ratio = 480. / visu.rows;
+        int newWidth = visu.cols * ratio;
+        cv::resize(visu, visu, cv::Size(newWidth, 480));
+        cv::imshow("", visu);
+        cv::waitKey(0);
+    }
+
 
     return EXIT_SUCCESS;
 

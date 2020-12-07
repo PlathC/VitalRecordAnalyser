@@ -19,6 +19,7 @@ find_package(OpenCV REQUIRED)
 # Add embedded libraries
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(thirdparty/json)
+set(PYBIND11_FINDPYTHON True)
 add_subdirectory(thirdparty/pybind11)
 add_subdirectory("thirdparty/clipper")
 add_subdirectory("thirdparty/lanms")
@@ -35,7 +36,6 @@ set(DB_HEADERS
         "include/Model/TextSegmentation/Scanner.hpp"
         "include/Model/TextSegmentation/WordSegmentation.hpp"
         "include/Model/TextSegmentation/TextSegmentation.hpp"
-        "include/Model/TextSegmentation/ParagraphSegmentation.hpp"
         "include/Model/TextSegmentation/Preprocessing.hpp"
         "include/Model/TextSegmentation/Segmentation.hpp"
         "include/Model/TextSegmentation/LocallySoftAdaptativeBinarization.hpp"
@@ -53,7 +53,6 @@ set(DB_SOURCES
         "src/Model/TextSegmentation/Scanner.cpp"
         "src/Model/TextSegmentation/WordSegmentation.cpp"
         "src/Model/TextSegmentation/TextSegmentation.cpp"
-        "src/Model/TextSegmentation/ParagraphSegmentation.cpp"
         "src/Model/TextSegmentation/Preprocessing.cpp"
         "src/Model/TextSegmentation/Segmentation.cpp"
         "src/Model/TextSegmentation/LocallySoftAdaptativeBinarization.cpp"
@@ -76,7 +75,6 @@ set(CRA_HEADERS
         "include/Model/TextSegmentation/Scanner.hpp"
         "include/Model/TextSegmentation/WordSegmentation.hpp"
         "include/Model/TextSegmentation/TextSegmentation.hpp"
-        "include/Model/TextSegmentation/ParagraphSegmentation.hpp"
         "include/Model/TextSegmentation/Preprocessing.hpp"
         "include/Model/TextSegmentation/Segmentation.hpp"
         "include/Model/TextSegmentation/LocallySoftAdaptativeBinarization.hpp"
@@ -93,7 +91,6 @@ set(CRA_SOURCES
         "src/Model/TextSegmentation/Scanner.cpp"
         "src/Model/TextSegmentation/WordSegmentation.cpp"
         "src/Model/TextSegmentation/TextSegmentation.cpp"
-        "src/Model/TextSegmentation/ParagraphSegmentation.cpp"
         "src/Model/TextSegmentation/Preprocessing.cpp"
         "src/Model/TextSegmentation/Segmentation.cpp"
         "src/Ui/PyOutputRedirector.cpp"
@@ -156,7 +153,10 @@ target_link_libraries(${CRA_TARGET} PRIVATE
         Qt5::Widgets
         ${OpenCV_LIBS}
         nlohmann_json::nlohmann_json
-        pybind11::embed)
+        pybind11::embed
+        clipper
+        lanms
+        )
 
 # Copy py folder to output
 file(GLOB PYTHONFILES
@@ -166,6 +166,7 @@ file(COPY ${PYTHONFILES} DESTINATION py)
 
 if(WIN32)
     get_target_property(QT5_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
+
     get_filename_component(QT5_WINDEPLOYQT_EXECUTABLE ${QT5_QMAKE_EXECUTABLE} PATH)
     set(QT5_WINDEPLOYQT_EXECUTABLE "${QT5_WINDEPLOYQT_EXECUTABLE}/windeployqt.exe")
 

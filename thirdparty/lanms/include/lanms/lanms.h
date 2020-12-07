@@ -200,13 +200,13 @@ namespace lanms {
 	}
 
     inline std::vector<Polygon>
-		merge_quadrangle_n9(const float *data, size_t n, float iou_threshold) {
+		merge_quadrangle_n9(const std::vector<std::vector<float>>& data, float iou_threshold) {
 			using cInt = cl::cInt;
 
 			// first pass
 			std::vector<Polygon> polys;
-			for (size_t i = 0; i < n; i ++) {
-				auto p = data + i * 9;
+			for (size_t i = 0; i < data.size(); i ++) {
+				auto p = data[i];
 				Polygon poly{
 					{
 						{cInt(p[0]), cInt(p[1])},

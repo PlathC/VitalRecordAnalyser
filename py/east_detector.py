@@ -4,6 +4,85 @@ import time
 import cv2
 
 
+class EastDetector:
+    def __init__(self, frozen_graph="./py/frozen_graph.pb",
+                 layer_names=None, score_map_thresh=0.8, box_thresh=0.1):
+        if layer_names is None:
+            layer_names = ["feature_fusion/Conv_7/Sigmoid", "feature_fusion/concat_3"]
+        self._layer_names = layer_names
+        self._model = cv2.dnn.readNetFromTensorflow(frozen_graph)
+        self._score_map_thresh = score_map_thresh
+        self._box_thresh = box_thresh
+
+    def detect_text(self, img):
+        im_resized, (ratio_h, ratio_w) = resize_image(img)
+        (height, width) = im_resized.shape[:2]
+
+        blob = cv2.dnn.blobFromImage(im_resized, size=(width, height), swapRB=True, crop=False)
+
+        self._model.setInput(blob)
+        (score_map, geo_map) = self._model.forward(self._layer_names)
+
+        if len(score_map.shape) == 4:
+            score_map = score_map[0, 0, :, :]
+            geo_map = geo_map[0, :, :, ]
+
+        # filter the score map
+        xy_text = np.argwhere(score_map > self._score_map_thresh)
+        # sort the text boxes via the y axis
+        xy_text = xy_text[np.argsort(xy_text[:, 0])]
+        # restore
+        start = time.time()
+        text_box_restored = restore_rectangle_rbox(xy_text[:, ::-1] * 4,
+                                                   np.transpose(geo_map[:, xy_text[:, 0], xy_text[:, 1]]))  # N*4*2
+
+        boxes = np.zeros((text_box_restored.shape[0], 9), dtype=np.float32)
+        boxes[:, :8] = text_box_restored.reshape((-1, 8))
+        boxes[:, 8] = score_map[xy_text[:, 0], xy_text[:, 1]]
+
+        return boxes, score_map, (ratio_h, ratio_w)
+
+    def post_process(self, boxes, score_map, ratio):
+        boxes = np.array(boxes)
+        score_map = np.array(score_map)
+
+        if boxes.shape[0] == 0:
+            return None
+
+        # here we filter some low score boxes by the average score map, this is different from the orginal paper
+        for i, box in enumerate(boxes):
+            mask = np.zeros_like(score_map, dtype=np.uint8)
+            cv2.fillPoly(mask, box[:8].reshape((-1, 4, 2)).astype(np.int32) // 4, 1)
+            boxes[i, 8] = cv2.mean(score_map, mask)[0]
+        boxes = boxes[boxes[:, 8] > self._box_thresh]
+
+        if boxes is not None:
+            boxes = boxes[:, :8].reshape((-1, 4, 2))
+            boxes[:, :, 0] /= ratio[0]
+            boxes[:, :, 1] /= ratio[1]
+
+        result_boxes = []
+        for i, box in enumerate(boxes):
+            # to avoid submitting errors
+            box = sort_poly(box.astype(np.int32))
+            if np.linalg.norm(box[0] - box[1]) < 5 or np.linalg.norm(box[3] - box[0]) < 5:
+                del result_boxes[i]
+                continue
+
+            result_boxes.append(np.array(box.astype(np.int32).reshape((-1, 2))))
+
+        return result_boxes
+
+
+def sort_poly(p):
+    min_axis = np.argmin(np.sum(p, axis=1))
+    p = p[[min_axis, (min_axis + 1) % 4, (min_axis + 2) % 4, (min_axis + 3) % 4]]
+    if abs(p[0, 0] - p[1, 0]) > abs(p[0, 1] - p[1, 1]):
+        return p
+    else:
+        return p[[0, 3, 2, 1]]
+
+
 def resize_image(im, max_side_len=2400):
     '''
     resize image to a size multiple of 32 which is required by the network
@@ -34,45 +113,6 @@ def resize_image(im, max_side_len=2400):
     ratio_w = resize_w / float(w)
 
     return im, (ratio_h, ratio_w)
-
-
-class EastDetector:
-    def __init__(self, frozen_graph="./py/frozen_graph.pb",
-                 layer_names=None):
-        if layer_names is None:
-            layer_names = ["feature_fusion/Conv_7/Sigmoid", "feature_fusion/concat_3"]
-        self.layer_names = layer_names
-        self.model = cv2.dnn.readNetFromTensorflow(frozen_graph)
-
-    def detect_text(self, img):
-        im_resized, (ratio_h, ratio_w) = resize_image(img)
-        (height, width) = im_resized.shape[:2]
-
-        blob = cv2.dnn.blobFromImage(im_resized, size=(width, height), swapRB=True, crop=False)
-
-        self.model.setInput(blob)
-        (score_map, geo_map) = self.model.forward(self.layer_names)
-
-        score_map_thresh = 0.8
-
-        if len(score_map.shape) == 4:
-            score_map = score_map[0, 0, :, :]
-            geo_map = geo_map[0, :, :, ]
-
-        # filter the score map
-        xy_text = np.argwhere(score_map > score_map_thresh)
-        # sort the text boxes via the y axis
-        xy_text = xy_text[np.argsort(xy_text[:, 0])]
-        # restore
-        start = time.time()
-        text_box_restored = restore_rectangle_rbox(xy_text[:, ::-1] * 4,
-                                                   np.transpose(geo_map[:, xy_text[:, 0], xy_text[:, 1]]))  # N*4*2
-        print('{} text boxes before nms'.format(text_box_restored.shape[0]))
-        boxes = np.zeros((text_box_restored.shape[0], 9), dtype=np.float32)
-        boxes[:, :8] = text_box_restored.reshape((-1, 8))
-        boxes[:, 8] = score_map[xy_text[:, 0], xy_text[:, 1]]
-
-        return boxes
 
 
 def restore_rectangle_rbox(origin, geometry):
