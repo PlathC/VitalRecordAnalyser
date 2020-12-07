@@ -3,6 +3,8 @@
 This tools aims to assist the segmentation of civil registry documents with image processing and machine learning
 algorithms.
 
+*This project is a proof of concept that should not be used for production purposes as it is since it can be instable.*
+
 ## Features
 
 ### DatasetBuilder
