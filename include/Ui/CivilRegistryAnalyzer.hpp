@@ -59,9 +59,9 @@ namespace CivilRegistryAnalyzer
             QObject::connect(&redirector, &CivilRegistryAnalyser::PyOutputRedirector::newStdOutContent, callback);
             QObject::connect(&redirector, &CivilRegistryAnalyser::PyOutputRedirector::newStdErrContent, callback);
 
-            std::vector<std::string> paragraphsResults;
-            std::string completeResult;
-            TextDetection textDetection;
+            std::vector<std::string> paragraphsResults{};
+            std::string completeResult{};
+            TextDetection textDetection{};
 
             for(const auto& paragraph : m_paragraphs)
             {

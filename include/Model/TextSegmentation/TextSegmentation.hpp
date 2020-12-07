@@ -44,11 +44,12 @@ public:
     uint8_t Progress();
     void Process();
     std::vector<std::vector<cv::Mat>> GetExtractedWords();
-    std::vector<cv::Mat> ExtractWords(const cv::Mat& src);
 
+    ~TextSegmentation();
 private:
     uint8_t m_progress = 0;
     std::mutex m_progressLocker;
+    pybind11::gil_scoped_release guard{};
 
     std::vector<std::vector<cv::Mat>> m_extractedWords;
     std::mutex m_imagesLock;

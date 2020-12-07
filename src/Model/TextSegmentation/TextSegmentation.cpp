@@ -77,10 +77,8 @@ void TextSegmentation::Process()
     auto quarters = segmentation::SegmentCivilStates(img);
     updateProgressValue(45);
 
-    namespace py = pybind11;
-    py::scoped_interpreter interpreter{};
+    pybind11::gil_scoped_acquire acquire;
     segmentation::EASTDetector detector{};
-
 
     const auto step = static_cast<uint8_t>(55. / quarters.size());
     for(const auto& quarter : quarters)
@@ -121,4 +119,10 @@ void TextSegmentation::Process()
     m_extractedWords = detectedWords;
 
     updateProgressValue(100);
+}
+
+TextSegmentation::~TextSegmentation()
+{
+    if(m_thread.joinable())
+        m_thread.join();
 }

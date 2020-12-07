@@ -125,10 +125,10 @@ namespace CivilRegistryAnalyzer
             m_pixmapSrc = QPixmap::fromImage(ImageUtil::CvMatToQImage(m_src));
             UpdateUi();
 
-            auto *segmenterDialog = new DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file), this);
-            if (segmenterDialog->exec())
+            auto segmenterDialog = DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file));
+            if (segmenterDialog.exec())
             {
-                auto paragraphs = segmenterDialog->GetParagraphs();
+                auto paragraphs = segmenterDialog.GetParagraphs();
 
                 if (!paragraphs.empty())
                 {
