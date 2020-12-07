@@ -21,7 +21,7 @@ TextSegmentation& TextSegmentation::operator=(TextSegmentation&& oldTextSegmenta
     m_progress = oldTextSegmentation.m_progress;
     m_src = oldTextSegmentation.m_src;
 
-    m_thread = std::move(oldTextSegmentation.m_thread);
+    oldTextSegmentation.m_thread.swap(m_thread);
     return *this;
 }
 
@@ -51,148 +51,74 @@ std::vector<std::vector<cv::Mat>> TextSegmentation::GetExtractedWords()
 
 void TextSegmentation::Process()
 {
-    std::vector<std::vector<cv::Mat>> detectedParagraphs;
-    cv::Mat blurred;
-    cv::blur(m_src, blurred, cv::Point(11, 11));
+    std::vector<std::vector<cv::Mat>> detectedWords;
 
-    cv::Mat edges;
-    cv::Canny(blurred, edges, 0, 200);
-    cv::threshold(edges, edges, 220, 255, cv::ThresholdTypes::THRESH_BINARY);
-
-    int kernelSize = 2;
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT,
-                                                cv::Size(2 * kernelSize + 1, 2 * kernelSize + 1),
-                                                cv::Point(kernelSize, kernelSize) );
-    cv::Mat dilation;
-    cv::dilate(edges, dilation, element, cv::Point(-1,-1), 1);
-    cv::erode(dilation, dilation, element, cv::Point(-1,-1), 1);
-    cv::dilate(dilation, dilation, element, cv::Point(-1,-1), 35);
-    cv::erode(dilation, dilation, element, cv::Point(-1,-1), 5);
-
-    cv::Mat dilationEdges;
-    cv::Canny(dilation, dilationEdges, 100, 200);
-
-    std::vector<std::vector<cv::Point> > contours;
-    std::vector<cv::Vec4i> hierarchy;
-    cv::findContours(dilationEdges, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-    cv::Mat fullContourImg;
-    m_src.copyTo(fullContourImg);
-
-    for(int i = 0; i < contours.size(); i++)
-        cv::drawContours( fullContourImg, contours, i, cv::Scalar(0, 0, 0), 2, 8, hierarchy, 0, cv::Point() );
-
-    cv::Mat contourImg;
-    m_src.copyTo(contourImg);
-    std::vector<cv::Mat> detectedArea;
-    for(const auto& currentContour : contours)
-    {
-        if(currentContour.empty())
-            continue;
-
-        if (cv::contourArea(currentContour) < MinArea)
-            continue;
-
-        cv::Rect box = cv::boundingRect(currentContour);
-        cv::Mat out = m_src(box);
-        cv::rectangle(contourImg,
-                cv::Point(box.x, box.y),
-                cv::Point( box.x + box.width, box.y + box.height),
-                cv::Scalar(0, 255, 0), 4),
-        detectedArea.push_back(out);
-    }
-
-    m_progressLocker.lock();
-    m_progress = 20;
-    m_progressLocker.unlock();
-
-    detectedArea.erase(std::remove_if(detectedArea.begin(), detectedArea.end(), [](const auto& img ) -> bool
-    {
-        return (img.cols * 2) < img.rows;
-    }), detectedArea.end());
-
-
-    uint8_t step = static_cast<uint8_t>(80 / detectedArea.size());
-    for(const auto& img : detectedArea)
-    {
-        std::vector<cv::Mat> extracted = ExtractWords(img);
-
-        detectedParagraphs.emplace_back(extracted);
-
+    auto updateProgressValue = [&](int newValue){
         std::lock_guard lock{m_progressLocker};
-        m_progress += step;
+        m_progress = newValue;
+    };
+
+    // Preprocessing
+    cv::Mat img = m_src.clone();
+    if(img.channels() > 1)
+        cv::cvtColor(img, img, cv::COLOR_BGR2GRAY);
+
+    cv::Rect sheetsBB = preprocessing::ExtractBiggestFeature(img);
+    img = img(sheetsBB);
+    img = preprocessing::GammaCorrection(img);
+    updateProgressValue(10);
+
+    img = preprocessing::LocallySoftAdaptiveBinarization(img);
+    updateProgressValue(30);
+
+    img = preprocessing::LocallySoftAdaptiveBinarization(img);
+    updateProgressValue(40);
+
+    auto quarters = segmentation::SegmentCivilStates(img);
+    updateProgressValue(45);
+
+    namespace py = pybind11;
+    py::scoped_interpreter interpreter{};
+    segmentation::EASTDetector detector{};
+
+
+    const auto step = static_cast<uint8_t>(55. / quarters.size());
+    for(const auto& quarter : quarters)
+    {
+        cv::Mat working = img(quarter).clone();
+
+        cv::cvtColor(working, working, cv::COLOR_GRAY2BGR);
+        auto boxes = detector.Process(working);
+
+        std::vector<cv::Mat> words;
+        words.reserve(boxes.size());
+        std::reverse(std::begin(boxes), std::end(boxes));
+
+        for(const auto& box : boxes)
+        {
+            words.emplace_back(m_src(box + cv::Point(quarter.x, quarter.y) + cv::Point(sheetsBB.x, sheetsBB.y)));
+            auto temp = m_src.clone();
+            cv::rectangle(temp, cv::Point{sheetsBB.x + box.x + quarter.x, sheetsBB.y + box.y + quarter.y},
+                          cv::Point{sheetsBB.x + box.x + box.width + quarter.x, sheetsBB.y + box.y + box.height + quarter.y}, cv::Scalar(0, 0, 0), 5);
+
+            // auto visu = temp.clone();
+            // //cv::imwrite("test.png", visu);
+            // double ratio = 720. / visu.rows;
+            // int newWidth = visu.cols * ratio;
+            // cv::resize(visu, visu, cv::Size(newWidth, 720));
+            // cv::imshow("", visu);
+            // cv::waitKey(0);
+        }
+        detectedWords.emplace_back(words);
+        updateProgressValue(m_progress + step);
     }
 
-    // Handle detection sens to provide the detection in a correct left to right / up to down way
-
-    std::reverse(std::begin(detectedParagraphs), std::end(detectedParagraphs));
+    // Handle detection directiob to provide the detection in a correct left to right / up to down way
+    //std::reverse(std::begin(detectedWords), std::end(detectedWords));
+    //std::reverse(std::begin(detectedWords), std::end(detectedWords));
 
     std::lock_guard lockImg{m_imagesLock};
-    m_extractedWords = detectedParagraphs;
-    std::lock_guard lockProgress{m_progressLocker};
+    m_extractedWords = detectedWords;
 
-    m_progress = 100;
-}
-
-std::vector<cv::Mat> TextSegmentation::ExtractWords(const cv::Mat& src)
-{
-    // Crop
-    cv::Mat imageCropped;
-    {
-        Scanner scanner{};
-        scanner.process(src, imageCropped);
-    }
-
-    // Resize and definitions
-    int newW = 1280;
-    int newH = ((newW * imageCropped.rows) / imageCropped.cols);
-    cv::resize(imageCropped, imageCropped, cv::Size(newW, newH));
-
-    int chunksNumber = 8;
-    int chunksProcess = 4;
-
-    // Binarization
-    cv::Mat imageBinary;
-    {
-        Binarization threshold{};
-
-        // default = 0 | otsu = 1 | niblack = 2 | sauvola = 3 | wolf = 4 //
-        threshold.binarize(imageCropped, imageBinary, false, 0);
-    }
-
-    // Line segmentation //
-    std::vector<cv::Mat> lines;
-    cv::Mat imageLines = imageBinary.clone();
-    {
-        LineSegmentation line{};
-        line.segment(imageLines, lines, chunksNumber, chunksProcess);
-    }
-
-    // START Step 4: word segmentation //
-    std::vector<cv::Mat> summary;
-    std::vector<cv::Mat> wordsSave;
-    {
-        WordSegmentation word{};
-        word.setKernel(11, 5, 1);
-
-        for (int i=0; i<lines.size(); i++) {
-            std::string lineIndex = std::to_string((i+1)*1e-6).substr(5);
-
-            std::vector<cv::Mat> words;
-            word.segment(lines[i], words);
-
-            summary.push_back(words[0]);
-            words.erase(words.begin());
-
-            words.erase(std::remove_if(words.begin(), words.end(), [](const auto& img ) -> bool
-            {
-                return img.cols < 100;
-            }), words.end());
-
-            for (const auto& currentWord : words)
-                wordsSave.push_back(currentWord);
-        }
-    }
-
-    return wordsSave;
+    updateProgressValue(100);
 }

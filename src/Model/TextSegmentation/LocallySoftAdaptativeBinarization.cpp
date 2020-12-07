@@ -19,7 +19,7 @@ namespace preprocessing
             gray.convertTo(gray, CV_8UC1);
         }
 
-        cv::medianBlur(gray, gray, 9);
+        cv::medianBlur(gray, gray, 7);
         cv::Mat invSrc =  cv::Scalar::all(255) - gray;
 
         // perform threshold on image block
@@ -42,9 +42,9 @@ namespace preprocessing
             }
         }
 
-        auto kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3));
+        auto kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
         cv::Mat mask;
-        cv::morphologyEx(outImage, mask, cv::MORPH_OPEN, kernel);
+        cv::morphologyEx(outImage, mask, cv::MORPH_OPEN, kernel, cv::Point(-1,-1), 1);
 
         outImage = cv::Mat(img.rows, img.cols, CV_8UC1);
         for(int i = 0; i < invSrc.rows; i += blockSize)
@@ -96,7 +96,9 @@ namespace preprocessing
             }
         }
 
-        cv::dilate(cv::Scalar::all(255) - imgOut, imgOut, cv::Mat(), cv::Point(-1, -1), 9);
+        cv::dilate(cv::Scalar::all(255) - imgOut, imgOut,
+                   cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5)),
+                   cv::Point(-1, -1), 20);
         return cv::Scalar::all(255) - imgOut;
     }
 

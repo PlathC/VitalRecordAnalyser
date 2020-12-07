@@ -18,7 +18,7 @@ namespace lanms {
 	inline float paths_area(const ClipperLib::Paths &ps) {
 		float area = 0;
 		for (auto &&p: ps)
-			area += cl::Area(p);
+			area += static_cast<float>(cl::Area(p));
 		return area;
 	}
 
@@ -66,17 +66,17 @@ namespace lanms {
 				assert(p.poly.size() == 4);
 				auto &poly = p.poly;
 				auto s = p.score;
-				data[0] += poly[0].X * s;
-				data[1] += poly[0].Y * s;
+				data[0] += static_cast<int64_t>(poly[0].X * s);
+				data[1] += static_cast<int64_t>(poly[0].Y * s);
 
-				data[2] += poly[1].X * s;
-				data[3] += poly[1].Y * s;
+				data[2] += static_cast<int64_t>(poly[1].X * s);
+				data[3] += static_cast<int64_t>(poly[1].Y * s);
 
-				data[4] += poly[2].X * s;
-				data[5] += poly[2].Y * s;
+				data[4] += static_cast<int64_t>(poly[2].X * s);
+				data[5] += static_cast<int64_t>(poly[2].Y * s);
 
-				data[6] += poly[3].X * s;
-				data[7] += poly[3].Y * s;
+				data[6] += static_cast<int64_t>(poly[3].X * s);
+				data[7] += static_cast<int64_t>(poly[3].Y * s);
 
 				score += p.score;
 
@@ -147,14 +147,14 @@ namespace lanms {
 				auto &poly = p.poly;
 				poly.resize(4);
 				auto score_inv = 1.0f / std::max(1e-8f, score);
-				poly[0].X = data[0] * score_inv;
-				poly[0].Y = data[1] * score_inv;
-				poly[1].X = data[2] * score_inv;
-				poly[1].Y = data[3] * score_inv;
-				poly[2].X = data[4] * score_inv;
-				poly[2].Y = data[5] * score_inv;
-				poly[3].X = data[6] * score_inv;
-				poly[3].Y = data[7] * score_inv;
+				poly[0].X = static_cast<ClipperLib::cInt>(data[0] * score_inv);
+				poly[0].Y = static_cast<ClipperLib::cInt>(data[1] * score_inv);
+				poly[1].X = static_cast<ClipperLib::cInt>(data[2] * score_inv);
+				poly[1].Y = static_cast<ClipperLib::cInt>(data[3] * score_inv);
+				poly[2].X = static_cast<ClipperLib::cInt>(data[4] * score_inv);
+				poly[2].Y = static_cast<ClipperLib::cInt>(data[5] * score_inv);
+				poly[3].X = static_cast<ClipperLib::cInt>(data[6] * score_inv);
+				poly[3].Y = static_cast<ClipperLib::cInt>(data[7] * score_inv);
 
 				assert(score > 0);
 				p.score = score;
@@ -200,40 +200,41 @@ namespace lanms {
 	}
 
     inline std::vector<Polygon>
-		merge_quadrangle_n9(const std::vector<std::vector<float>>& data, float iou_threshold) {
-			using cInt = cl::cInt;
+        merge_quadrangle_n9(const float *data, size_t n, float iou_threshold) {
+            using cInt = cl::cInt;
 
-			// first pass
-			std::vector<Polygon> polys;
-			for (size_t i = 0; i < data.size(); i ++) {
-				auto p = data[i];
-				Polygon poly{
-				    cl::Path{
-						{cInt(p[0]), cInt(p[1])},
-						{cInt(p[2]), cInt(p[3])},
-						{cInt(p[4]), cInt(p[5])},
-						{cInt(p[6]), cInt(p[7])},
-					},
-					p[8],
-				};
+            // first pass
+            std::vector<Polygon> polys;
+            for (size_t i = 0; i < n; i ++) {
+                auto p = data + i * 9;
+                Polygon poly{
+                        {
+                                {cInt(p[0]), cInt(p[1])},
+                                {cInt(p[2]), cInt(p[3])},
+                                {cInt(p[4]), cInt(p[5])},
+                                {cInt(p[6]), cInt(p[7])},
+                        },
+                        p[8],
+                };
 
-				if (polys.size()) {
-					// merge with the last one
-					auto &bpoly = polys.back();
-					if (should_merge(poly, bpoly, iou_threshold)) {
-						PolyMerger merger;
-						merger.add(bpoly);
-						merger.add(poly);
-						bpoly = merger.get();
-					} else {
-						polys.emplace_back(poly);
-					}
-				} else {
-					polys.emplace_back(poly);
-				}
-			}
-			return standard_nms(polys, iou_threshold);
-		}
+                if (polys.size()) {
+                    // merge with the last one
+                    auto &bpoly = polys.back();
+                    if (should_merge(poly, bpoly, iou_threshold)) {
+                        PolyMerger merger;
+                        merger.add(bpoly);
+                        merger.add(poly);
+                        bpoly = merger.get();
+                    } else {
+                        polys.emplace_back(poly);
+                    }
+                } else {
+                    polys.emplace_back(poly);
+                }
+            }
+            return standard_nms(polys, iou_threshold);
+        }
+
 
     inline std::vector<std::vector<float>> polys2floats(const std::vector<lanms::Polygon> &polys)
     {
@@ -241,11 +242,11 @@ namespace lanms {
         for (const auto & p : polys) {
             auto &poly = p.poly;
             ret.emplace_back(std::vector<float>{
-                    float(poly[0].X), float(poly[0].Y),
-                    float(poly[1].X), float(poly[1].Y),
-                    float(poly[2].X), float(poly[2].Y),
-                    float(poly[3].X), float(poly[3].Y),
-                    float(p.score),
+                    static_cast<float>(poly[0].X), static_cast<float>(poly[0].Y),
+                    static_cast<float>(poly[1].X), static_cast<float>(poly[1].Y),
+                    static_cast<float>(poly[2].X), static_cast<float>(poly[2].Y),
+                    static_cast<float>(poly[3].X), static_cast<float>(poly[3].Y),
+                    static_cast<float>(p.score),
             });
         }
         return ret;

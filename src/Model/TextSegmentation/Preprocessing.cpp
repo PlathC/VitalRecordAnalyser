@@ -15,7 +15,7 @@ namespace preprocessing
         return out;
     }
 
-    cv::Mat ExtractBiggestFeature(const cv::Mat& img, uint16_t horizontalDilation)
+    cv::Rect ExtractBiggestFeature(const cv::Mat& img, uint16_t horizontalDilation)
     {
         cv::Mat blurred{};
         cv::GaussianBlur(img, blurred, cv::Size{15, 15}, 0);
@@ -44,6 +44,6 @@ namespace preprocessing
 
         cv::Rect boudingBox = cv::boundingRect(approximation);
 
-        return img(boudingBox).clone();
+        return boudingBox;
     }
 }

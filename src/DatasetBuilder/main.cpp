@@ -2,22 +2,22 @@
 #include <iostream>
 
 #include <QApplication>
+
+#include "Ui/DatasetBuilder.hpp"
+
+// #ifdef slots
+// #undef slots
+// #endif
 //
-// #include "Ui/DatasetBuilder.hpp"
-
-#ifdef slots
-#undef slots
-#endif
-
-#include "Model/TextSegmentation/EASTDetector.hpp"
-#include "Model/TextSegmentation/Preprocessing.hpp"
-#include "Model/TextSegmentation/Segmentation.hpp"
-
-#define slots
+// #include "Model/TextSegmentation/EASTDetector.hpp"
+// #include "Model/TextSegmentation/Preprocessing.hpp"
+// #include "Model/TextSegmentation/Segmentation.hpp"
+//
+// #define slots
 
 int main(int argc, char** argv) {
 
-    auto img = cv::imread("6kSample.jpg", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
+    /*auto img = cv::imread("6kSample.jpg", cv::IMREAD_ANYDEPTH | cv::IMREAD_ANYCOLOR);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     img = preprocessing::ExtractBiggestFeature(img);
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
         for(auto& box:boxes)
         {
             cv::rectangle(working, cv::Point(box.x, box.y), cv::Point(box.x + box.width, box.y + box.height),
-                          cv::Scalar(0., 0., 0.), 10);
+                          cv::Scalar(0., 0., 0.), 5);
         }
 
 
@@ -77,11 +77,11 @@ int main(int argc, char** argv) {
     }
 
 
-    return EXIT_SUCCESS;
+    return EXIT_SUCCESS;*/
 
-    // QApplication app{argc, argv};
-    // DatasetBuilder::DatasetBuilder w indow;
-    // window.show();
+    QApplication app{argc, argv};
+    DatasetBuilder::DatasetBuilder window;
+    window.show();
 
-    //return app.exec();
+    return app.exec();
 }

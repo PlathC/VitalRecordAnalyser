@@ -2,9 +2,6 @@
 // Created by Platholl on 06/12/2020.
 //
 
-#include <utility>
-
-
 #include "Model/TextSegmentation/EASTDetector.hpp"
 
 namespace segmentation {
@@ -18,7 +15,7 @@ namespace segmentation {
             )");
 
             m_eastDetectorModule = py::module::import("east_detector");
-            assert(py::hasattr(m_eastDetector, "EastDetector"));
+            assert(py::hasattr(m_eastDetectorModule, "EastDetector"));
             m_eastDetector = m_eastDetectorModule.attr("EastDetector")();
         }
         catch(const std::exception& e)
@@ -34,16 +31,25 @@ namespace segmentation {
         try
         {
             py::object rawPythonBoxes = m_eastDetector.attr("detect_text")(src);
-            auto output = rawPythonBoxes.cast<std::tuple<std::vector<std::vector<float>>,
+            auto output = rawPythonBoxes.cast<std::tuple<py::array_t<float,
+                                                         py::array::c_style | py::array::forcecast>,
                                                  std::vector<std::vector<float>>,
                                                  std::array<float, 2>>>();
-            std::vector<std::vector<float>> rawBoxes = std::get<0>(output);
+            auto rawBoxes = std::get<0>(output);
+
+            auto pbuf = rawBoxes.request();
+            if (pbuf.ndim != 2 || pbuf.shape[1] != 9)
+                throw std::runtime_error("quadrangles must have a shape of (n, 9)");
+
+            auto n = pbuf.shape[0];
+            auto ptr = static_cast<float *>(pbuf.ptr);
+
             std::vector<std::vector<float>> nonMixedBoxes = lanms::polys2floats(
-                    lanms::merge_quadrangle_n9(rawBoxes, 0.2)
+                    lanms::merge_quadrangle_n9(ptr, n, 0.2f)
                     );
 
             py::object finalResult = m_eastDetector.attr("post_process")(nonMixedBoxes,
-                    std::get<1>(output), std::get<2>(output));
+                    std::get<1>(output), std::get<2>(output), src.cols);
 
             using Point = std::vector<int>;
             using Box = std::vector<Point>;
@@ -54,8 +60,8 @@ namespace segmentation {
             for(const auto& box : finalBoxes)
             {
                 resultedBoudingBox.emplace_back(
-                        cv::Point(box[0][0], box[0][1]),
-                        cv::Point(box[2][0], box[2][1])
+                        cv::Point(std::abs(box[0][0]), std::abs(box[0][1])),
+                        cv::Point(std::abs(box[2][0]), std::abs(box[2][1]))
                 );
             }
 

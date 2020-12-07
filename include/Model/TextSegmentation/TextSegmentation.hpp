@@ -14,10 +14,17 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "Binarization.hpp"
-#include "Scanner.hpp"
-#include "LineSegmentation.hpp"
-#include "WordSegmentation.hpp"
+#ifdef slots
+    #undef slots
+        #include "Model/TextSegmentation/EASTDetector.hpp"
+        #include "Model/TextSegmentation/Preprocessing.hpp"
+        #include "Model/TextSegmentation/Segmentation.hpp"
+    #define slots
+#else
+    #include "Model/TextSegmentation/EASTDetector.hpp"
+    #include "Model/TextSegmentation/Preprocessing.hpp"
+    #include "Model/TextSegmentation/Segmentation.hpp"
+#endif
 
 namespace fs = std::filesystem;
 
@@ -48,7 +55,6 @@ private:
 
     std::thread m_thread;
 
-    static constexpr uint16_t MinArea = 44000;
     cv::Mat m_src;
 };
 

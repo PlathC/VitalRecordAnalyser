@@ -2,6 +2,7 @@ import numpy as np
 import argparse
 import time
 import cv2
+from scipy.signal import find_peaks
 
 
 class EastDetector:
@@ -41,7 +42,7 @@ class EastDetector:
 
         return boxes, score_map, (ratio_h, ratio_w)
 
-    def post_process(self, boxes, score_map, ratio):
+    def post_process(self, boxes, score_map, ratio, width):
         boxes = np.array(boxes)
         score_map = np.array(score_map)
 
@@ -57,8 +58,8 @@ class EastDetector:
 
         if boxes is not None:
             boxes = boxes[:, :8].reshape((-1, 4, 2))
-            boxes[:, :, 0] /= ratio[0]
-            boxes[:, :, 1] /= ratio[1]
+            boxes[:, :, 0] /= ratio[1]
+            boxes[:, :, 1] /= ratio[0]
 
         result_boxes = []
         for i, box in enumerate(boxes):
@@ -69,7 +70,34 @@ class EastDetector:
                 continue
 
             result_boxes.append(np.array(box.astype(np.int32).reshape((-1, 2))))
+        result_boxes = np.array(result_boxes)
 
+        result_boxes = sorted(result_boxes, key=lambda r: r[0][1])
+
+        if len(result_boxes) > 2:
+            height_differential = []
+            for i in range(1, len(result_boxes)):
+                diff = abs((result_boxes[i - 1][0][1] + result_boxes[i - 1][3][1]) // 2 - \
+                           (result_boxes[i][0][1] + result_boxes[i][3][1]) // 2)
+                height_differential.append(diff)
+
+            stand = np.std(height_differential)
+            mean_height_difference = np.mean(height_differential) // 2
+            maximas = find_peaks(height_differential, height=stand if stand > 0 else 1)[0]
+
+            sorted_boxes = [result_boxes[0]]
+            current_row = []
+            for i in range(1, len(result_boxes)):
+                # new line
+                if i - 1 in maximas:
+                    current_row = sorted(current_row, key=lambda r: r[0][0])
+                    sorted_boxes.extend(np.array(current_row))
+                    current_row = [result_boxes[i]]
+                else:
+                    current_row.append(result_boxes[i])
+
+            sorted_boxes.extend(np.array(current_row))
+            result_boxes = np.array(sorted_boxes)
         return result_boxes
 
 
