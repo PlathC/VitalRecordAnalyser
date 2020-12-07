@@ -13,17 +13,53 @@ namespace segmentation
 
         for(auto& quarter : quarters)
         {
-            // auto subImg = std::get<1>(quarter);
-            // auto visu = subImg.clone();
-            // double ratio = 480. / visu.rows;
-            // int newWidth = visu.cols * ratio;
-            // cv::resize(visu, visu, cv::Size(newWidth, 480));
-            // cv::imshow("", visu);
-            // cv::waitKey(0);
+            cv::Rect currentBB = std::get<0>(quarter);
 
-            regions.emplace_back(std::get<0>(quarter));
+            auto sides = SegmentSidedParts(rawImage(currentBB));
+            cv::Rect leftSide = std::get<0>(sides[0]);
+            cv::Rect rightSide = std::get<0>(sides[1]);
+
+            regions.emplace_back(leftSide  + cv::Point(currentBB.x, currentBB.y));
+            regions.emplace_back(rightSide + cv::Point(currentBB.x, currentBB.y));
         }
         return regions;
+    }
+
+    std::vector<std::tuple<cv::Rect, cv::Mat>> SegmentSidedParts(const cv::Mat& img, const uint8_t divideStep)
+    {
+        cv::Mat workingCopy = img.clone();
+        if(workingCopy.channels() > 1)
+        {
+            cv::cvtColor(workingCopy, workingCopy, cv::COLOR_BGR2GRAY);
+        }
+
+        const int width = workingCopy.cols;
+        const int height = workingCopy.rows;
+
+        const int step = static_cast<int>(std::floor(width / static_cast<float>(divideStep)));
+        std::vector<uint8_t> axisHistogram;
+        axisHistogram.reserve(workingCopy.rows);
+        for(int i = 0; i < workingCopy.rows; i++)
+        {
+            const auto* pixel = workingCopy.ptr<uint8_t>(i);
+            for(int j = step; j < width - step; j++)
+            {
+                if(i == 0)
+                {
+                    axisHistogram.emplace_back(0);
+                }
+                axisHistogram[j - step] += pixel[j] != 0 ? 1 : 0;
+            }
+        }
+        auto minimumHistogramValue = std::distance(axisHistogram.begin(),
+                                                   std::min_element(axisHistogram.begin(),
+                                                                    axisHistogram.end()));
+
+        int index = minimumHistogramValue + step;
+        auto r1 = cv::Rect{cv::Point{0, 0}, cv::Point{index, height}};
+        auto r2 = cv::Rect{cv::Point{index, 0}, cv::Point{width, height}};
+
+        return {{r1, img(r1)}, {r2, img(r2)}};
     }
 
     std::vector<std::tuple<cv::Rect, cv::Mat>> DetectQuarters(const cv::Mat& img, const int stepDivider)

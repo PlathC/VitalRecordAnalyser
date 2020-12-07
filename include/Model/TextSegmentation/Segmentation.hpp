@@ -10,7 +10,8 @@
 namespace segmentation
 {
     std::vector<cv::Rect> SegmentCivilStates(const cv::Mat& rawImage);
-    std::vector<std::tuple<cv::Rect, cv::Mat>> DetectQuarters(const cv::Mat& img, const int stepDivider);
+    std::vector<std::tuple<cv::Rect, cv::Mat>> SegmentSidedParts(const cv::Mat& img, uint8_t divideStep=4);
+    std::vector<std::tuple<cv::Rect, cv::Mat>> DetectQuarters(const cv::Mat& img, int stepDivider);
 }
 
 #endif //CIVILREGISTRYANALYSER_SEGMENTATION_HPP

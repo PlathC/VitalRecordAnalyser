@@ -50,6 +50,15 @@ int main(int argc, char** argv) {
     for(const auto& quarter : quarters)
     {
         cv::Mat working = img(quarter).clone();
+
+        auto visu = working.clone();
+        double ratio = 480. / visu.rows;
+        int newWidth = visu.cols * ratio;
+        cv::resize(visu, visu, cv::Size(newWidth, 480));
+        cv::imshow("", visu);
+        cv::waitKey(0);
+
+
         cv::cvtColor(working, working, cv::COLOR_GRAY2BGR);
         auto boxes = detector.Process(working);
         for(auto& box:boxes)
@@ -58,9 +67,10 @@ int main(int argc, char** argv) {
                           cv::Scalar(0., 0., 0.), 10);
         }
 
-        auto visu = working.clone();
-        double ratio = 480. / visu.rows;
-        int newWidth = visu.cols * ratio;
+
+        visu = working.clone();
+        ratio = 480. / visu.rows;
+        newWidth = visu.cols * ratio;
         cv::resize(visu, visu, cv::Size(newWidth, 480));
         cv::imshow("", visu);
         cv::waitKey(0);
