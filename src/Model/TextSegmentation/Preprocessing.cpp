@@ -18,14 +18,10 @@ namespace preprocessing
     cv::Rect ExtractBiggestFeature(const cv::Mat& img, uint16_t horizontalDilation)
     {
         cv::Mat blurred{};
+
         cv::GaussianBlur(img, blurred, cv::Size{15, 15}, 0);
 
-        cv::Mat element = getStructuringElement(cv::MORPH_ELLIPSE,
-                                                cv::Size(1, horizontalDilation));
-        cv::dilate(blurred, blurred, element);
-        element = getStructuringElement(cv::MORPH_ELLIPSE,
-                                        cv::Size(1, horizontalDilation));
-
+        cv::dilate(blurred, blurred, cv::Mat::ones(1, horizontalDilation, CV_8UC1), cv::Point(-1, -1));
         cv::threshold(cv::Scalar(255) - blurred, blurred, 50, 255, cv::THRESH_BINARY_INV);
 
         std::vector<std::vector<cv::Point>> contours;
