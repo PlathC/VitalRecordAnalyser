@@ -38,7 +38,9 @@ namespace CivilRegistryAnalyzer
             QString detectedText = "";
             for(const auto& txt : m_extractedText)
             {
-                detectedText += QString::fromStdString(txt) + "\n";
+                for(const auto& word : txt)
+                    detectedText += QString::fromStdString(word);
+                detectedText += "\n";
             }
             QString txt = ui->m_ptDetectedText->toPlainText();
             ui->m_ptDetectedText->clear();
@@ -99,12 +101,13 @@ namespace CivilRegistryAnalyzer
         writeFile.close();
     }
 
-    void CivilRegistryAnalyzer::onNewCorrectedText(std::vector<std::string> newExtractedText)
+    void CivilRegistryAnalyzer::onNewCorrectedText(std::vector<std::vector<std::string>> newExtractedText)
     {
         m_extractedText.clear();
         for(const auto& nText : newExtractedText)
         {
             m_extractedText.emplace_back(nText);
+            m_extractedText.emplace_back("\n");
         }
         UpdateUi();
     }

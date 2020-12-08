@@ -59,7 +59,7 @@ namespace CivilRegistryAnalyzer
             QObject::connect(&redirector, &CivilRegistryAnalyser::PyOutputRedirector::newStdOutContent, callback);
             QObject::connect(&redirector, &CivilRegistryAnalyser::PyOutputRedirector::newStdErrContent, callback);
 
-            std::vector<std::string> paragraphsResults{};
+            std::vector<std::vector<std::string>> paragraphsResults{};
             std::string completeResult{};
             TextDetection textDetection{};
 
@@ -74,6 +74,7 @@ namespace CivilRegistryAnalyzer
                         emit progressChanged(QString::fromStdString(result));
                     }
                 }
+
                 if(!completeResult.empty())
                 {
                     paragraphsResults.emplace_back(completeResult);
@@ -85,7 +86,8 @@ namespace CivilRegistryAnalyzer
 
             for(auto& paragraph : paragraphsResults)
             {
-                paragraph = textDetection.Correct(paragraph);
+                for(auto& words : paragraph)
+                    words = textDetection.Correct(words);
             }
             emit onNewCorrectedText(paragraphsResults);
 
@@ -94,8 +96,11 @@ namespace CivilRegistryAnalyzer
 
             for(auto& paragraph: paragraphsResults)
             {
-                auto analysis = textDetection.AnalyseText(paragraph);
-                emit onNewAnalysis(analysis);
+                for(auto& words : paragraph)
+                {
+                    auto analysis = textDetection.AnalyseText(words);
+                    emit onNewAnalysis(analysis);
+                }
             }
 
             emit finish();
@@ -103,7 +108,7 @@ namespace CivilRegistryAnalyzer
     signals:
         void onNewOutput(QString);
         void progressChanged(QString newExtractedText);
-        void onNewCorrectedText(std::vector<std::string> newExtractedText);
+        void onNewCorrectedText(std::vector<std::vector<std::string>> newExtractedText);
         void onNewAnalysis(std::map<std::string, std::string> newAnalysis);
         void finish();
 
@@ -129,7 +134,7 @@ namespace CivilRegistryAnalyzer
         void onProgressChanged(QString info);
         void extractTextFinished();
         void onNewAnalysis(std::map<std::string, std::string> newAnalysis);
-        void onNewCorrectedText(std::vector<std::string> newExtractedText);
+        void onNewCorrectedText(std::vector<std::vector<std::string>> newExtractedText);
 
     private slots:
         void OpenImage();
@@ -143,7 +148,7 @@ namespace CivilRegistryAnalyzer
         cv::Mat m_src;
         QPixmap m_pixmapSrc;
         std::vector<std::vector<cv::Mat>> m_paragraphsFragments;
-        std::vector<std::string> m_extractedText;
+        std::vector<std::vector<std::string>> m_extractedText;
 
         py::scoped_interpreter interpreter{};
 
