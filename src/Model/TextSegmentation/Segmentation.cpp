@@ -22,6 +22,7 @@ namespace segmentation
             regions.emplace_back(leftSide  + cv::Point(currentBB.x, currentBB.y));
             regions.emplace_back(rightSide + cv::Point(currentBB.x, currentBB.y));
         }
+
         return regions;
     }
 
@@ -35,10 +36,11 @@ namespace segmentation
 
         const int width = workingCopy.cols;
         const int height = workingCopy.rows;
-
         const int step = static_cast<int>(std::floor(width / static_cast<float>(divideStep)));
+
         std::vector<uint8_t> axisHistogram;
         axisHistogram.reserve(workingCopy.rows);
+        workingCopy = cv::Scalar(1) - workingCopy;
         for(int i = 0; i < workingCopy.rows; i++)
         {
             const auto* pixel = workingCopy.ptr<uint8_t>(i);
@@ -48,14 +50,17 @@ namespace segmentation
                 {
                     axisHistogram.emplace_back(0);
                 }
-                axisHistogram[j - step] += pixel[j] != 0 ? 1 : 0;
+                axisHistogram[j - step] += pixel[j];
             }
         }
+
         auto minimumHistogramValue = std::distance(axisHistogram.begin(),
                                                    std::min_element(axisHistogram.begin(),
                                                                     axisHistogram.end()));
 
-        int index = minimumHistogramValue + step;
+        minimumHistogramValue = minimumHistogramValue < 0 ? 0 : minimumHistogramValue;
+        int index = static_cast<int>(minimumHistogramValue) + step;
+
         auto r1 = cv::Rect{cv::Point{0, 0}, cv::Point{index, height}};
         auto r2 = cv::Rect{cv::Point{index, 0}, cv::Point{width, height}};
 
@@ -126,7 +131,7 @@ namespace segmentation
         results.emplace_back(r1, i1);
 
         // Bottom right corner
-        cv::Rect r2 = cv::Rect{img.cols - idx2, img.rows - idx1, idx2, idx1};
+        cv::Rect r2 = cv::Rect{img.cols - idx2, idx1, idx2, img.rows - idx1};
         cv::Mat i2  = img(r2);
         results.emplace_back(r2, i2);
 

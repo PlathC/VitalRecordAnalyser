@@ -10,7 +10,7 @@
 namespace segmentation
 {
     std::vector<cv::Rect> SegmentCivilStates(const cv::Mat& rawImage);
-    std::vector<std::tuple<cv::Rect, cv::Mat>> SegmentSidedParts(const cv::Mat& img, uint8_t divideStep=4);
+    std::vector<std::tuple<cv::Rect, cv::Mat>> SegmentSidedParts(const cv::Mat& img, uint8_t divideStep=7);
     std::vector<std::tuple<cv::Rect, cv::Mat>> DetectQuarters(const cv::Mat& img, int stepDivider);
 }
 

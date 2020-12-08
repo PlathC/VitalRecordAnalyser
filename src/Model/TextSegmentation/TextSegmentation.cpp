@@ -71,14 +71,12 @@ void TextSegmentation::Process()
     img = preprocessing::LocallySoftAdaptiveBinarization(img);
     updateProgressValue(30);
 
-    img = preprocessing::LocallySoftAdaptiveBinarization(img);
-    updateProgressValue(40);
-
     auto quarters = segmentation::SegmentCivilStates(img);
     updateProgressValue(45);
 
     pybind11::gil_scoped_acquire acquire;
     segmentation::EASTDetector detector{};
+    //auto visu = m_src.clone();
 
     const auto step = static_cast<uint8_t>(55. / quarters.size());
     for(const auto& quarter : quarters)
@@ -95,21 +93,20 @@ void TextSegmentation::Process()
         for(const auto& box : boxes)
         {
             words.emplace_back(m_src(box + cv::Point(quarter.x, quarter.y) + cv::Point(sheetsBB.x, sheetsBB.y)));
-            auto temp = m_src.clone();
-            cv::rectangle(temp, cv::Point{sheetsBB.x + box.x + quarter.x, sheetsBB.y + box.y + quarter.y},
-                          cv::Point{sheetsBB.x + box.x + box.width + quarter.x, sheetsBB.y + box.y + box.height + quarter.y}, cv::Scalar(0, 0, 0), 5);
-
-            // auto visu = temp.clone();
-            // //cv::imwrite("test.png", visu);
-            // double ratio = 720. / visu.rows;
-            // int newWidth = visu.cols * ratio;
-            // cv::resize(visu, visu, cv::Size(newWidth, 720));
-            // cv::imshow("", visu);
-            // cv::waitKey(0);
+            //cv::rectangle(visu, cv::Point{sheetsBB.x + box.x + quarter.x, sheetsBB.y + box.y + quarter.y},
+            //              cv::Point{sheetsBB.x + box.x + box.width + quarter.x, sheetsBB.y + box.y + box.height + quarter.y}, cv::Scalar(0, 0, 0), 5);
         }
         detectedWords.emplace_back(words);
         updateProgressValue(m_progress + step);
     }
+    updateProgressValue(m_progress + step);
+
+    // cv::imwrite("test.png", visu);
+    // double ratio = 720. / visu.rows;
+    // int newWidth = visu.cols * ratio;
+    // cv::resize(visu, visu, cv::Size(newWidth, 720));
+    // cv::imshow("", visu);
+    // cv::waitKey(0);
 
     // Handle detection directiob to provide the detection in a correct left to right / up to down way
     //std::reverse(std::begin(detectedWords), std::end(detectedWords));
