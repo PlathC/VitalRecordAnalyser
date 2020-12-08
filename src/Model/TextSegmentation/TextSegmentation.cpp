@@ -93,8 +93,6 @@ void TextSegmentation::Process()
         for(const auto& box : boxes)
         {
             words.emplace_back(m_src(box + cv::Point(quarter.x, quarter.y) + cv::Point(sheetsBB.x, sheetsBB.y)));
-            //cv::rectangle(visu, cv::Point{sheetsBB.x + box.x + quarter.x, sheetsBB.y + box.y + quarter.y},
-            //              cv::Point{sheetsBB.x + box.x + box.width + quarter.x, sheetsBB.y + box.y + box.height + quarter.y}, cv::Scalar(0, 0, 0), 5);
         }
         detectedWords.emplace_back(words);
         updateProgressValue(m_progress + step);
