@@ -3,7 +3,7 @@
 This tools aims to assist the segmentation of civil registry documents with image processing and machine learning
 algorithms.
 
-*This project is a proof of concept that should not be used for production purposes as it is since it can be instable.*
+*This project is a proof of concept that should not be used for production purposes as it is, since it can be highly unstable.*
 
 ## Features
 
@@ -23,6 +23,40 @@ algorithms.
 - Text features extractions with NLP.
 
 ![CivilRegistryAnalyzer](images/scCivilRegistryAnalyzer.png)
+   
+## Installation
+
+### Dependencies
+
+- OpenCv (Tested with >= 4.0.1)
+- Qt (Tested with >= 5.11.2)
+- Python 3 
+
+You might also need CUDA if you want to use Tensorflow's GPU version.
+
+In order to use conda environment inside the software you need to provide the following environment variables :
+
+- PYTHONHOME = `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>`
+- PYTHONPATH = 
+    - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\DLLs\`
+    - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Lib\`
+    - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Lib\site-packages`
+- Add the following paths in your PATH :
+    - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Library\bin`
+    - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Library\Scripts`
+    - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Library`
+
+### Clone and  Build
+
+```
+git clone --recurse-submodules -j8 https://github.com/PlathC/CivilRegistryAnalyser.git
+cd CivilRegistryAnalyser
+pip install -r requirements.txt
+
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
 
 ## Assets
 
@@ -46,35 +80,13 @@ to the `ctc.ctc_loss()` function that should be on lines 5763-5764.
 
 Once the training is finished you can run tests to see if the training you have done is efficient. To do so you just need to run the `test.py` file. If you want to replace the
 model used in the CivilRegistryAnalyser you need to replace the `checkpoint_weights.hdf5` file in the `py` folder by the one that has been created in `output/civil/flor`. 
-   
-## Installation
 
-### Dependencies
-
-- OpenCv (Tested with >= 4.0.1)
-- Qt (Tested with >= 5.11.2)
-- Python 3 (You need to provide PYTHONHOME environment variable)
-
-You might also need CUDA if you want to use Tensorflow's GPU version.
-
-### Clone and  Build
-
-```
-git clone --recurse-submodules -j8 https://github.com/PlathC/CivilRegistryAnalyser.git
-cd CivilRegistryAnalyser
-pip install -r requirements.txt
-
-mkdir build && cd build
-cmake ..
-cmake --build .
-```
-
-### Based on
+## Based on
 
 - [arthurflor23 / handwritten-text-recognition](https://github.com/arthurflor23/handwritten-text-recognition)
 - [arthurflor23 / text-segmentation](https://github.com/arthurflor23/text-segmentation)
 
-### Contributors
+## Contributors
 
 [Enzo Bonnot](https://github.com/enzo-bonnot)
 
