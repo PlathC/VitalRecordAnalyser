@@ -198,7 +198,7 @@ class HTRModel:
         :return: raw data on `ctc_decode=False` or CTC decode on `ctc_decode=True` (both with probabilities)
         """
 
-        self.model._make_predict_function()
+        # self.model._make_predict_function()
 
         if verbose == 1:
             print("Model Predict")

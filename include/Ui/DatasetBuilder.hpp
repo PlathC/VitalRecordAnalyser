@@ -16,15 +16,17 @@
 #include <QMessageBox>
 #include <QTreeView>
 
-#include "include/Model/ImageUtil.hpp"
+#include "Model/ImageUtil.hpp"
 
-#include "include/Model/Dataset/ImageSet.hpp"
+#include "Model/Dataset/ImageSet.hpp"
 #include "ImageSegmenterDialog.hpp"
 
 namespace Ui
 {
     class DatasetBuilder;
 }
+
+namespace py = pybind11;
 
 namespace DatasetBuilder
 {
@@ -55,6 +57,8 @@ namespace DatasetBuilder
         DatasetImage* m_currentImg = nullptr;
         QPixmap m_pixmapSrc;
         ImageSet* m_currentSet = nullptr;
+
+        py::scoped_interpreter interpreter{};
 
         bool m_outputFolderSelected = false;
         std::string m_outputFolder;

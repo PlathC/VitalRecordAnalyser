@@ -59,11 +59,12 @@ namespace DatasetBuilder
             QStringList files = dialog->selectedFiles();
             for(const auto& file : files)
             {
-                auto* segmenterDialog = new ImageSegmenterDialog(file, this);
+                auto segmenterDialog = ImageSegmenterDialog(file);
+                //segmenterDialog->setAttribute(Qt::WA_DeleteOnClose);
 
-                if(segmenterDialog->exec())
+                if(segmenterDialog.exec())
                 {
-                    auto paragraphs = segmenterDialog->GetParagraphs();
+                    auto paragraphs = segmenterDialog.GetParagraphs();
                     if(!paragraphs.empty())
                     {
                         std::vector<cv::Mat> flattenPage;

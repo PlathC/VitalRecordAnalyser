@@ -19,14 +19,16 @@ find_package(OpenCV REQUIRED)
 # Add embedded libraries
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(thirdparty/json)
+set(PYBIND11_FINDPYTHON True)
 add_subdirectory(thirdparty/pybind11)
-
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+add_subdirectory("thirdparty/clipper")
+add_subdirectory("thirdparty/lanms")
 
 set(DB_HEADERS
         "include/Ui/DatasetBuilder.hpp"
         "include/Ui/ImageSegmenterDialog.hpp"
         "include/Model/ImageUtil.hpp"
+        "include/Model/MatCaster.hpp"
         "include/Model/Dataset/DatasetImage.hpp"
         "include/Model/Dataset/ImageSet.hpp"
         "include/Model/TextSegmentation/Binarization.hpp"
@@ -34,6 +36,10 @@ set(DB_HEADERS
         "include/Model/TextSegmentation/Scanner.hpp"
         "include/Model/TextSegmentation/WordSegmentation.hpp"
         "include/Model/TextSegmentation/TextSegmentation.hpp"
+        "include/Model/TextSegmentation/Preprocessing.hpp"
+        "include/Model/TextSegmentation/Segmentation.hpp"
+        "include/Model/TextSegmentation/LocallySoftAdaptativeBinarization.hpp"
+        "include/Model/TextSegmentation/EASTDetector.hpp"
         )
 
 set(DB_SOURCES
@@ -47,6 +53,10 @@ set(DB_SOURCES
         "src/Model/TextSegmentation/Scanner.cpp"
         "src/Model/TextSegmentation/WordSegmentation.cpp"
         "src/Model/TextSegmentation/TextSegmentation.cpp"
+        "src/Model/TextSegmentation/Preprocessing.cpp"
+        "src/Model/TextSegmentation/Segmentation.cpp"
+        "src/Model/TextSegmentation/LocallySoftAdaptativeBinarization.cpp"
+        "src/Model/TextSegmentation/EASTDetector.cpp"
         )
 
 set(DB_UI
@@ -59,13 +69,17 @@ set(CRA_HEADERS
         "include/Ui/ImageSegmenterDialog.hpp"
         "include/Model/ImageUtil.hpp"
         "include/Model/TextDetection/TextDetection.hpp"
-        "include/Model/TextDetection/MatCaster.hpp"
+        "include/Model/MatCaster.hpp"
         "include/Model/TextSegmentation/Binarization.hpp"
         "include/Model/TextSegmentation/LineSegmentation.hpp"
         "include/Model/TextSegmentation/Scanner.hpp"
         "include/Model/TextSegmentation/WordSegmentation.hpp"
         "include/Model/TextSegmentation/TextSegmentation.hpp"
-        "include/Ui/PyOutputRedirector.hpp")
+        "include/Model/TextSegmentation/Preprocessing.hpp"
+        "include/Model/TextSegmentation/Segmentation.hpp"
+        "include/Model/TextSegmentation/LocallySoftAdaptativeBinarization.hpp"
+        "include/Model/TextSegmentation/EASTDetector.hpp"
+        )
 
 set(CRA_SOURCES
         "src/CivilRegistryAnalyzer/main.cpp"
@@ -77,7 +91,11 @@ set(CRA_SOURCES
         "src/Model/TextSegmentation/Scanner.cpp"
         "src/Model/TextSegmentation/WordSegmentation.cpp"
         "src/Model/TextSegmentation/TextSegmentation.cpp"
-        "src/Ui/PyOutputRedirector.cpp")
+        "src/Model/TextSegmentation/Preprocessing.cpp"
+        "src/Model/TextSegmentation/Segmentation.cpp"
+        "src/Model/TextSegmentation/LocallySoftAdaptativeBinarization.cpp"
+        "src/Model/TextSegmentation/EASTDetector.cpp"
+        )
 
 set(CRA_UI
         "src/Ui/ImageSegmenterDialog.ui"
@@ -106,27 +124,38 @@ elseif (MSVC)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_compile_options(${DB_TARGET} PRIVATE /std:c++17 /Zc:__cplusplus /MDd /Od /EHsc /wd4996 /Zi /wd4634 /wd4635)
     else()
-        target_compile_options(${DB_TARGET} PRIVATE /std:c++17 /Zc:__cplusplus /DNDEBUG /O2 /Ob2 /EHsc /Zi /wd4996 /wd4634 /wd4635)
-        target_link_options(${DB_TARGET} PRIVATE /SUBSYSTEM:windows /ENTRY:mainCRTStartup)
+        target_compile_options(${DB_TARGET} PRIVATE /std:c++17 /Zc:__cplusplus /DNDEBUG /O2
+                # /Ob2
+                /EHsc /Zi /wd4996 /wd4634 /wd4635)
+        target_link_options(${DB_TARGET} PRIVATE /SUBSYSTEM:CONSOLE /ENTRY:mainCRTStartup
+                )
     endif()
 endif ()
 
 target_include_directories(${CRA_TARGET} SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${CRA_TARGET} SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(${CRA_TARGET} SYSTEM PRIVATE "thirdparty/clipper/include")
 target_include_directories(${DB_TARGET} SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_include_directories(${DB_TARGET} SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(${DB_TARGET} SYSTEM PRIVATE "thirdparty/clipper/include")
 
 target_link_libraries(${DB_TARGET} PRIVATE
         Qt5::Widgets
         ${OpenCV_LIBS}
         nlohmann_json::nlohmann_json
+        pybind11::embed
+        clipper
+        lanms
         )
 
 target_link_libraries(${CRA_TARGET} PRIVATE
         Qt5::Widgets
         ${OpenCV_LIBS}
         nlohmann_json::nlohmann_json
-        pybind11::embed)
+        pybind11::embed
+        clipper
+        lanms
+        )
 
 # Copy py folder to output
 file(GLOB PYTHONFILES
@@ -136,6 +165,7 @@ file(COPY ${PYTHONFILES} DESTINATION py)
 
 if(WIN32)
     get_target_property(QT5_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
+
     get_filename_component(QT5_WINDEPLOYQT_EXECUTABLE ${QT5_QMAKE_EXECUTABLE} PATH)
     set(QT5_WINDEPLOYQT_EXECUTABLE "${QT5_WINDEPLOYQT_EXECUTABLE}/windeployqt.exe")
 

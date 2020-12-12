@@ -116,6 +116,8 @@ def preprocess(img, input_size):
         img = np.asarray(img[boundbox[0]:boundbox[1], boundbox[2]:boundbox[3]], dtype=np.uint8)
 
     wt, ht, _ = input_size
+    if len(img.shape) > 2:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     h, w = np.asarray(img).shape
     f = max((w / wt), (h / ht))
 

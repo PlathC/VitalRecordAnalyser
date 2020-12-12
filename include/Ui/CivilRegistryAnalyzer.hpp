@@ -23,7 +23,6 @@
 
 #include "Model/ImageUtil.hpp"
 #include "Ui/ImageSegmenterDialog.hpp"
-#include "Ui/PyOutputRedirector.hpp"
 
 namespace Ui
 {
@@ -31,8 +30,10 @@ namespace Ui
 }
 
 using CsvHolder = std::map<std::string, std::string>;
+using RawResultHolder = std::vector<std::vector<std::string>>;
 using ParagraphHolder = std::vector<std::string>;
 Q_DECLARE_METATYPE(std::string)
+Q_DECLARE_METATYPE(RawResultHolder)
 Q_DECLARE_METATYPE(ParagraphHolder)
 Q_DECLARE_METATYPE(CsvHolder)
 
@@ -42,64 +43,96 @@ namespace CivilRegistryAnalyzer
     {
         Q_OBJECT
     public:
-        explicit TextDetectionThread(const std::vector<std::vector<cv::Mat>>& paragraphs):
-                m_paragraphs(paragraphs)
-        {}
+        explicit TextDetectionThread(QObject* parent = nullptr,
+                                     std::vector<std::vector<cv::Mat>> paragraphs = {},
+                                     bool withCorrection = false,
+                                     bool withAnalysis = false):
+                QThread(parent),
+                m_paragraphs(std::move(paragraphs)),
+                m_withCorrection(withCorrection),
+                m_withAnalysis(withAnalysis)
+        {
+        }
 
         void run() override
         {
-            pybind11::gil_scoped_acquire acquire;
+            pybind11::gil_scoped_acquire acquire{};
 
-            CivilRegistryAnalyser::PyOutputRedirector redirector{};
+            std::vector<std::string> paragraphsResults{};
+            TextDetection textDetection{};
 
-            auto callback = [&](QString content){
-                emit onNewOutput(content);
-            };
-
-            QObject::connect(&redirector, &CivilRegistryAnalyser::PyOutputRedirector::newStdOutContent, callback);
-            QObject::connect(&redirector, &CivilRegistryAnalyser::PyOutputRedirector::newStdErrContent, callback);
-
-            std::vector<std::string> paragraphsResults;
-            std::string completeResult;
-            TextDetection textDetection;
-
+            emit onNewOutput("--INFO-- Start text extraction");
+            size_t paragraphCount = 0;
             for(const auto& paragraph : m_paragraphs)
             {
+                std::string tempParagraph{};
+                size_t wordCount = 0;
                 for(const auto& word : paragraph)
                 {
-                    std::string result = textDetection.Process(word);
+                    emit onNewOutput(QString::fromStdString("--INFO-- Processing " + std::to_string(wordCount++)
+                                + " out of " + std::to_string(paragraph.size()) + " on "
+                                + std::to_string(paragraphCount) + " out of "
+                                + std::to_string(m_paragraphs.size()) + "paragraphs"));
+                    cv::Mat temp = word.clone();
+                    if(word.channels() != 1 )
+                    {
+                        cv::cvtColor(temp, temp, cv::COLOR_BGR2GRAY);
+                    }
+                    std::string result = textDetection.Process(temp);
                     if(!result.empty())
                     {
-                        completeResult += result;
+                        tempParagraph += result + ' ';
                         emit progressChanged(QString::fromStdString(result));
                     }
                 }
-                if(!completeResult.empty())
+
+                paragraphCount++;
+                if(!tempParagraph.empty())
                 {
-                    paragraphsResults.emplace_back(completeResult);
-                    completeResult.clear();
+                    paragraphsResults.emplace_back(tempParagraph);
                 }
             }
+
             emit onNewOutput("--INFO-- End of detection");
-            emit onNewOutput("--INFO-- Start correction");
 
-            for(auto& paragraph : paragraphsResults)
+            if (m_withCorrection)
             {
-                paragraph = textDetection.Correct(paragraph);
+                emit onNewOutput("--INFO-- Start correction");
+                std::vector<std::string> result{};
+                for(auto& paragraph : paragraphsResults)
+                {
+                    result.emplace_back(textDetection.Correct(paragraph));
+                }
+                emit onNewCorrectedText(result);
+
+                emit onNewOutput("--INFO-- End of correction");
             }
-            emit onNewCorrectedText(paragraphsResults);
-
-            emit onNewOutput("--INFO-- End of correction");
-            emit onNewOutput("--INFO-- Start analysis");
-
-            for(auto& paragraph: paragraphsResults)
+            else
             {
-                auto analysis = textDetection.AnalyseText(paragraph);
-                emit onNewAnalysis(analysis);
+                emit onNewOutput("--INFO-- Skip correction, provide raw paragraphs");
+                std::vector<std::string> result{};
+                for(auto& paragraph : paragraphsResults)
+                {
+                    result.emplace_back(paragraph);
+                }
+                emit onNewCorrectedText(result);
+            }
+
+
+            if (m_withAnalysis)
+            {
+                emit onNewOutput("--INFO-- Start analysis");
+                for(auto& paragraph: paragraphsResults)
+                {
+                    auto analysis = textDetection.AnalyseText(paragraph);
+                    emit onNewAnalysis(analysis);
+                }
+                emit onNewOutput("--INFO-- END analysis");
             }
 
             emit finish();
         }
+
     signals:
         void onNewOutput(QString);
         void progressChanged(QString newExtractedText);
@@ -113,6 +146,8 @@ namespace CivilRegistryAnalyzer
         // https://github.com/pybind/pybind11/issues/1273#issuecomment-366449829
         pybind11::gil_scoped_release guard{};
         std::vector<std::vector<cv::Mat>> m_paragraphs;
+        bool m_withAnalysis;
+        bool m_withCorrection;
     };
 
     class CivilRegistryAnalyzer : public QMainWindow
@@ -143,7 +178,9 @@ namespace CivilRegistryAnalyzer
         cv::Mat m_src;
         QPixmap m_pixmapSrc;
         std::vector<std::vector<cv::Mat>> m_paragraphsFragments;
-        std::vector<std::string> m_extractedText;
+        std::vector<std::vector<std::string>> m_extractedText;
+
+        TextDetectionThread* m_workerThread = nullptr;
 
         py::scoped_interpreter interpreter{};
 
