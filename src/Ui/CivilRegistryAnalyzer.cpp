@@ -61,7 +61,7 @@ namespace CivilRegistryAnalyzer
 
     void CivilRegistryAnalyzer::onProgressChanged(QString info)
     {
-        m_extractedText.emplace_back(info.toStdString() + "\n");
+        m_extractedText.emplace_back(std::vector<std::string>{info.toStdString() + "\n"});
         UpdateUi();
     }
 
@@ -71,7 +71,7 @@ namespace CivilRegistryAnalyzer
         QMessageBox::information(this, "Information", "The analysis is done, you can find"
                                                       " the outputCsv.csv at the root path of this program.");
 
-        pybind11::gil_scoped_acquire();
+        //pybind11::gil_scoped_acquire();
     }
 
     void CivilRegistryAnalyzer::onNewAnalysis(std::map<std::string, std::string> newAnalysis)
@@ -101,17 +101,15 @@ namespace CivilRegistryAnalyzer
         writeFile.close();
     }
 
-    void CivilRegistryAnalyzer::onNewCorrectedText(std::vector<std::vector<std::string>> newExtractedText)
+    void CivilRegistryAnalyzer::onNewCorrectedText(std::vector<std::string> newExtractedText)
     {
         m_extractedText.clear();
         for(const auto& nText : newExtractedText)
         {
-            m_extractedText.emplace_back(nText);
-            m_extractedText.emplace_back("\n");
+            m_extractedText.emplace_back(std::vector<std::string>{nText});
         }
         UpdateUi();
     }
-
 
     void CivilRegistryAnalyzer::OpenImage()
     {
@@ -128,14 +126,14 @@ namespace CivilRegistryAnalyzer
             m_pixmapSrc = QPixmap::fromImage(ImageUtil::CvMatToQImage(m_src));
             UpdateUi();
 
-            auto segmenterDialog = DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file));
-            if (segmenterDialog.exec())
+            auto segmentationDialog = DatasetBuilder::ImageSegmenterDialog(QString::fromStdString(file));
+            if (segmentationDialog.exec())
             {
-                auto paragraphs = segmenterDialog.GetParagraphs();
+                auto paragraphs = segmentationDialog.GetParagraphs();
 
                 if (!paragraphs.empty())
                 {
-                    for(const auto& paragraph : paragraphs)
+                    for(auto& paragraph : paragraphs)
                     {
                         if(!paragraph.empty())
                         {
@@ -155,36 +153,35 @@ namespace CivilRegistryAnalyzer
         {
             ui->m_pbLaunchAnalysis->setEnabled(false);
 
-            auto* workerThread = new TextDetectionThread(m_paragraphsFragments);
+            m_workerThread = new TextDetectionThread(this, m_paragraphsFragments);
 
-            qRegisterMetaType<std::vector<std::string> >("std::vector<std::string>");
+            qRegisterMetaType<std::vector<std::vector<std::string>>>("std::vector<std::vector<std::string>>");
             qRegisterMetaType<std::map<std::string, std::string>>("std::map<std::string, std::string>");
 
             // Connect our signal and slot
-            QObject::connect(workerThread, &TextDetectionThread::onNewOutput,
-                             this, [&](QString content){
+            QObject::connect(m_workerThread, &TextDetectionThread::onNewOutput,
+                             this, [&](const QString& content){
                         ui->m_tePromptOutput->moveCursor (QTextCursor::End);
-                        ui->m_tePromptOutput->insertPlainText(content);
+                        ui->m_tePromptOutput->insertPlainText(content + '\n');
                         ui->m_tePromptOutput->moveCursor (QTextCursor::End);
-
                     });
 
-            QObject::connect(workerThread, &TextDetectionThread::progressChanged,
-                             this, &CivilRegistryAnalyzer::onProgressChanged);
+            QObject::connect(m_workerThread, &TextDetectionThread::progressChanged,
+                             this, &CivilRegistryAnalyzer::onProgressChanged, Qt::BlockingQueuedConnection);
 
-            QObject::connect(workerThread, &TextDetectionThread::onNewCorrectedText,
-                             this, &CivilRegistryAnalyzer::onNewCorrectedText);
+            QObject::connect(m_workerThread, &TextDetectionThread::onNewCorrectedText,
+                             this, &CivilRegistryAnalyzer::onNewCorrectedText, Qt::BlockingQueuedConnection);
 
-            QObject::connect(workerThread, &TextDetectionThread::onNewAnalysis,
-                             this, &CivilRegistryAnalyzer::onNewAnalysis);
+            QObject::connect(m_workerThread, &TextDetectionThread::onNewAnalysis,
+                             this, &CivilRegistryAnalyzer::onNewAnalysis, Qt::BlockingQueuedConnection);
 
-            QObject::connect(workerThread, &QThread::finished,
-                             workerThread, &QObject::deleteLater);
+            QObject::connect(m_workerThread, &TextDetectionThread::finish,
+                             this, &CivilRegistryAnalyzer::extractTextFinished, Qt::BlockingQueuedConnection);
 
-            QObject::connect(workerThread, &QThread::finished,
-                        this, &CivilRegistryAnalyzer::extractTextFinished);
+            QObject::connect(m_workerThread, &QThread::finished,
+                             m_workerThread, &TextDetectionThread::deleteLater, Qt::DirectConnection);
 
-            workerThread->start();
+            m_workerThread->start();
         }
 
     }

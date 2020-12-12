@@ -28,6 +28,30 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 log.addHandler(handler)
 
+
+def resize_with_aspect_ratio(image, width=None, height=None, inter=cv2.INTER_AREA):
+    dim = None
+    (h, w) = image.shape[:2]
+
+    if width is None and height is None:
+        return image
+
+    if width is None:
+        r = height / float(h)
+        dim = (int(w * r), height)
+    else:
+        r = width / float(w)
+        dim = (width, int(h * r))
+
+    return cv2.resize(image, dim, interpolation=inter)
+
+
+def show_image(img):
+    img = resize_with_aspect_ratio(img, width=800)
+    cv2.imshow('resize', img)
+    cv2.waitKey(0)
+
+
 class TextRecognizer:
 
     def __init__(self, checkpoint_path="./py/checkpoint_weights.hdf5", input_size=(1024, 128, 1), max_text_length=128, charset_base=string.printable[:95], architecture="flor"):

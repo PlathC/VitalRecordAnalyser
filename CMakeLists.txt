@@ -79,7 +79,7 @@ set(CRA_HEADERS
         "include/Model/TextSegmentation/Segmentation.hpp"
         "include/Model/TextSegmentation/LocallySoftAdaptativeBinarization.hpp"
         "include/Model/TextSegmentation/EASTDetector.hpp"
-        "include/Ui/PyOutputRedirector.hpp")
+        )
 
 set(CRA_SOURCES
         "src/CivilRegistryAnalyzer/main.cpp"
@@ -93,7 +93,6 @@ set(CRA_SOURCES
         "src/Model/TextSegmentation/TextSegmentation.cpp"
         "src/Model/TextSegmentation/Preprocessing.cpp"
         "src/Model/TextSegmentation/Segmentation.cpp"
-        "src/Ui/PyOutputRedirector.cpp"
         "src/Model/TextSegmentation/LocallySoftAdaptativeBinarization.cpp"
         "src/Model/TextSegmentation/EASTDetector.cpp"
         )
