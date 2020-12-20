@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     source_path = os.path.join("..", "data", f"{args.source}.hdf5")
     output_path = os.path.join("..", "output", args.source, args.arch)
-    target_path = os.path.join(output_path, "checkpoint_weights.hdf5")
+    target_path = os.path.join(output_path, "checkpoint_recognizer.hdf5")
 
     input_size = (1024, 128, 1)
     max_text_length = 128

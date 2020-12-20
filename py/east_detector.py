@@ -6,7 +6,7 @@ from scipy.signal import find_peaks
 
 
 class EastDetector:
-    def __init__(self, frozen_graph="./py/frozen_graph.pb",
+    def __init__(self, frozen_graph="./py/frozen_east.pb",
                  layer_names=None, score_map_thresh=0.8, box_thresh=0.1):
         if layer_names is None:
             layer_names = ["feature_fusion/Conv_7/Sigmoid", "feature_fusion/concat_3"]

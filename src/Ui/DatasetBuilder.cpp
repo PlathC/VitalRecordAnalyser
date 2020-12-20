@@ -70,7 +70,7 @@ namespace DatasetBuilder
                         std::vector<cv::Mat> flattenPage;
                         for(const auto& paragraph : paragraphs)
                         {
-                            flattenPage.insert(flattenPage.end(), paragraph.begin(), paragraph.end());
+                            flattenPage.insert(flattenPage.end(), paragraph.rbegin(), paragraph.rend());
                         }
 
                         m_sets.emplace_back(file.toStdString(), flattenPage, m_outputFolder);

@@ -83,7 +83,7 @@ namespace CivilRegistryAnalyzer
         if(!readFile.good())
         {
             readFile.close();
-            std::ofstream writeFile{outputCsv, std::ios::app};
+            std::ofstream writeFile{ outputCsv, std::ios::app };
             for (const auto & newAnalyse : newAnalysis)
             {
                 writeFile << newAnalyse.first << ",";
@@ -153,33 +153,33 @@ namespace CivilRegistryAnalyzer
         {
             ui->m_pbLaunchAnalysis->setEnabled(false);
 
-            m_workerThread = new TextDetectionThread(this, m_paragraphsFragments);
+            m_workerThread = new TextRecognitionThread(this, m_paragraphsFragments);
 
             qRegisterMetaType<std::vector<std::vector<std::string>>>("std::vector<std::vector<std::string>>");
             qRegisterMetaType<std::map<std::string, std::string>>("std::map<std::string, std::string>");
 
             // Connect our signal and slot
-            QObject::connect(m_workerThread, &TextDetectionThread::onNewOutput,
+            QObject::connect(m_workerThread, &TextRecognitionThread::onNewOutput,
                              this, [&](const QString& content){
                         ui->m_tePromptOutput->moveCursor (QTextCursor::End);
                         ui->m_tePromptOutput->insertPlainText(content + '\n');
                         ui->m_tePromptOutput->moveCursor (QTextCursor::End);
                     });
 
-            QObject::connect(m_workerThread, &TextDetectionThread::progressChanged,
+            QObject::connect(m_workerThread, &TextRecognitionThread::progressChanged,
                              this, &CivilRegistryAnalyzer::onProgressChanged, Qt::BlockingQueuedConnection);
 
-            QObject::connect(m_workerThread, &TextDetectionThread::onNewCorrectedText,
+            QObject::connect(m_workerThread, &TextRecognitionThread::onNewCorrectedText,
                              this, &CivilRegistryAnalyzer::onNewCorrectedText, Qt::BlockingQueuedConnection);
 
-            QObject::connect(m_workerThread, &TextDetectionThread::onNewAnalysis,
+            QObject::connect(m_workerThread, &TextRecognitionThread::onNewAnalysis,
                              this, &CivilRegistryAnalyzer::onNewAnalysis, Qt::BlockingQueuedConnection);
 
-            QObject::connect(m_workerThread, &TextDetectionThread::finish,
+            QObject::connect(m_workerThread, &TextRecognitionThread::finish,
                              this, &CivilRegistryAnalyzer::extractTextFinished, Qt::BlockingQueuedConnection);
 
             QObject::connect(m_workerThread, &QThread::finished,
-                             m_workerThread, &TextDetectionThread::deleteLater, Qt::DirectConnection);
+                             m_workerThread, &TextRecognitionThread::deleteLater, Qt::DirectConnection);
 
             m_workerThread->start();
         }

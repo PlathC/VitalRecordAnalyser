@@ -2,9 +2,9 @@
 // Created by Platholl on 15/05/2020.
 //
 
-#include "Model/TextDetection/TextDetection.hpp"
+#include "Model/TextRecognition/TextRecognition.hpp"
 
-TextDetection::TextDetection()
+TextRecognition::TextRecognition()
 {
     try
     {
@@ -13,7 +13,7 @@ TextDetection::TextDetection()
             sys.path.insert(0,'py')
         )");
 
-        m_textDetection = py::module::import("text_detection");
+        m_textDetection = py::module::import("text_recognizer");
         m_textCorrection = py::module::import("text_correction");
         m_textAnalyser = py::module::import("nlp");
 
@@ -29,7 +29,7 @@ TextDetection::TextDetection()
     }
 }
 
-std::string TextDetection::Process(const cv::Mat& src)
+std::string TextRecognition::Process(const cv::Mat& src)
 {
     assert(py::hasattr(m_textRecognizer, "read_text_from_image"));
     try
@@ -46,7 +46,7 @@ std::string TextDetection::Process(const cv::Mat& src)
 }
 
 
-std::string TextDetection::Correct(const std::string& paragraph)
+std::string TextRecognition::Correct(const std::string& paragraph)
 {
     assert(py::hasattr(m_textCorrection, "correct_sentence"));
     try
@@ -60,7 +60,7 @@ std::string TextDetection::Correct(const std::string& paragraph)
     }
 }
 
-std::map<std::string, std::string> TextDetection::AnalyseText(const std::string& text)
+std::map<std::string, std::string> TextRecognition::AnalyseText(const std::string& text)
 {
     assert(py::hasattr(m_textAnalyser, "process_text"));
     try

@@ -18,7 +18,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/embed.h>
 
-#include "Model/TextDetection/TextDetection.hpp"
+#include "Model/TextRecognition/TextRecognition.hpp"
 #define slots
 
 #include "Model/ImageUtil.hpp"
@@ -39,14 +39,14 @@ Q_DECLARE_METATYPE(CsvHolder)
 
 namespace CivilRegistryAnalyzer
 {
-    class TextDetectionThread : public QThread
+    class TextRecognitionThread : public QThread
     {
         Q_OBJECT
     public:
-        explicit TextDetectionThread(QObject* parent = nullptr,
-                                     std::vector<std::vector<cv::Mat>> paragraphs = {},
-                                     bool withCorrection = false,
-                                     bool withAnalysis = false):
+        explicit TextRecognitionThread(QObject* parent = nullptr,
+                                       std::vector<std::vector<cv::Mat>> paragraphs = {},
+                                       bool withCorrection = false,
+                                       bool withAnalysis = false):
                 QThread(parent),
                 m_paragraphs(std::move(paragraphs)),
                 m_withCorrection(withCorrection),
@@ -59,7 +59,7 @@ namespace CivilRegistryAnalyzer
             pybind11::gil_scoped_acquire acquire{};
 
             std::vector<std::string> paragraphsResults{};
-            TextDetection textDetection{};
+            TextRecognition textRecognizer{};
 
             emit onNewOutput("--INFO-- Start text extraction");
             size_t paragraphCount = 0;
@@ -78,7 +78,7 @@ namespace CivilRegistryAnalyzer
                     {
                         cv::cvtColor(temp, temp, cv::COLOR_BGR2GRAY);
                     }
-                    std::string result = textDetection.Process(temp);
+                    std::string result = textRecognizer.Process(temp);
                     if(!result.empty())
                     {
                         tempParagraph += result + ' ';
@@ -101,7 +101,7 @@ namespace CivilRegistryAnalyzer
                 std::vector<std::string> result{};
                 for(auto& paragraph : paragraphsResults)
                 {
-                    result.emplace_back(textDetection.Correct(paragraph));
+                    result.emplace_back(textRecognizer.Correct(paragraph));
                 }
                 emit onNewCorrectedText(result);
 
@@ -124,7 +124,7 @@ namespace CivilRegistryAnalyzer
                 emit onNewOutput("--INFO-- Start analysis");
                 for(auto& paragraph: paragraphsResults)
                 {
-                    auto analysis = textDetection.AnalyseText(paragraph);
+                    auto analysis = textRecognizer.AnalyseText(paragraph);
                     emit onNewAnalysis(analysis);
                 }
                 emit onNewOutput("--INFO-- END analysis");
@@ -180,7 +180,7 @@ namespace CivilRegistryAnalyzer
         std::vector<std::vector<cv::Mat>> m_paragraphsFragments;
         std::vector<std::vector<std::string>> m_extractedText;
 
-        TextDetectionThread* m_workerThread = nullptr;
+        TextRecognitionThread* m_workerThread = nullptr;
 
         py::scoped_interpreter interpreter{};
 

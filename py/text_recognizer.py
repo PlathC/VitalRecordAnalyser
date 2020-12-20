@@ -54,7 +54,7 @@ def show_image(img):
 
 class TextRecognizer:
 
-    def __init__(self, checkpoint_path="./py/checkpoint_weights.hdf5", input_size=(1024, 128, 1), max_text_length=128, charset_base=string.printable[:95], architecture="flor"):
+    def __init__(self, checkpoint_path="./py/checkpoint_recognizer.hdf5", input_size=(1024, 128, 1), max_text_length=128, charset_base=string.printable[:95], architecture="flor"):
         self.tokenizer = None
         self.model = None
         self.checkpoint_path = checkpoint_path

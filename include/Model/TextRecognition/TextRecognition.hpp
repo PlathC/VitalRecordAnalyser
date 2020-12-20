@@ -2,8 +2,8 @@
 // Created by Platholl on 15/05/2020.
 //
 
-#ifndef CIVILREGISTRYANALYSER_TEXTDETECTION_HPP
-#define CIVILREGISTRYANALYSER_TEXTDETECTION_HPP
+#ifndef CIVILREGISTRYANALYSER_TEXTRECOGNITION_HPP
+#define CIVILREGISTRYANALYSER_TEXTRECOGNITION_HPP
 
 #include <iostream>
 #include <map>
@@ -19,10 +19,10 @@
 
 namespace py = pybind11;
 
-class TextDetection
+class TextRecognition
 {
 public:
-    TextDetection();
+    TextRecognition();
     std::string Process(const cv::Mat& src);
     std::string Correct(const std::string& text);
     std::map<std::string, std::string> AnalyseText(const std::string& text);
@@ -37,4 +37,4 @@ private:
 };
 
 
-#endif //CIVILREGISTRYANALYSER_TEXTDETECTION_HPP
+#endif //CIVILREGISTRYANALYSER_TEXTRECOGNITION_HPP
