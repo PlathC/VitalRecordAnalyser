@@ -43,7 +43,7 @@ In order to use conda environment inside the software you need to provide the fo
     - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Lib\site-packages`
 - Add the following paths in your PATH :
     - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Library\bin`
-    - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Library\Scripts`
+    - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Scripts`
     - `<PathToAnacondaInstallation>\Anaconda\envs\<TheEnvironmentYouWantToUse>\Library`
 
 ### Clone and  Build
