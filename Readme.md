@@ -81,10 +81,15 @@ to the `ctc.ctc_loss()` function that should be on lines 5763-5764.
 Once the training is finished you can run tests to see if the training you have done is efficient. To do so you just need to run the `test.py` file. If you want to replace the
 model used in the CivilRegistryAnalyser you need to replace the `checkpoint_weights.hdf5` file in the `py` folder by the one that has been created in `output/civil/flor`. 
 
+### EAST model
+
+For text segmentation we used the EAST (An Efficient and Accurate Scene Text Detector) model with a dataset that we created. All the files used for the EAST model and training can be found in the `py/EAST` folder. To train the model the file used is `multigpu_train.py` and the dataset path should be provided in the `icdar.py` for the `training_data_path` flag. Once the model has been trained the graph can be frozen with the `convert_graph.py` and then used with opencv to run the text detection with the `eval_frozen_graph.py`file.
+
 ## Based on
 
 - [arthurflor23 / handwritten-text-recognition](https://github.com/arthurflor23/handwritten-text-recognition)
 - [arthurflor23 / text-segmentation](https://github.com/arthurflor23/text-segmentation)
+- [argman / EAST](https://github.com/argman/EAST)
 
 ## Contributors
 
