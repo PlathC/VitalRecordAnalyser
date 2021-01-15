@@ -1,4 +1,4 @@
-# CivilRegistryAnalyzer
+# VitalRecordAnalyzer
 
 This tools aims to assist the segmentation of civil registry documents with image processing and machine learning
 algorithms.
