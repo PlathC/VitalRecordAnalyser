@@ -1,19 +1,18 @@
 # VitalRecordAnalyzer
 
-Vital records are rich of meaningful historical data concerning city as well as countryside inhabitants that can be used, among others, to study former populations and then reveal the social, economic and demographic characteristics of those populations. However, these studies encounter a main difficulty for collecting the data needed since most of these records are scanned documents that need a manual transcription step in order to gather all the data and start exploiting it from a historical point of view. This step consequently slows down the historical research and is an obstacle to a better knowledge of the population habits depending on their social conditions. Therefore in this paper we present a modular and self-sufficient analysis pipeline using state-of-the-art algorithms mostly regardless of the document layout that aims to automate this data extraction process.
-
+Vital records are rich of meaningful historical data concerning city as well as countryside inhabitants that can be used, among others, to study former populations and then reveal the social, economic and demographic characteristics of those populations. However, these studies encounter a main difficulty for collecting the data needed since most of these records are scanned documents that need a manual transcription step in order to gather all the data and start exploiting it from a historical point of view. This step consequently slows down the historical research and is an obstacle to a better knowledge of the population habits depending on their social conditions. Therefore in this paper, we present a modular and self-sufficient analysis pipeline using state-of-the-art algorithms mostly regardless of the document layout that aims to automate this data extraction process.
 
 ```
 @unpublished{plateauholleville:hal-03189188,
-  title = {{French vital records data gathering and analysis through image processing and machine learning algorithms}},
-  author = {Plateau-Holleville, Cyprien and Bonnot, Enzo and Gechter, Franck and Heyberger, Laurent},
-  url = {https://hal.archives-ouvertes.fr/hal-03189188},
-  note = {working paper or preprint},
-  year = {2021},
-  keywords = {Historical Data ; Optical Character Recognition ; Handwritten Text Recognition ; Machine Learning},
-  pdf = {https://hal.archives-ouvertes.fr/hal-03189188/file/French_vital_records_data_gathering_and_analysis_through_image_processing_and_machine_learning_algorithms.pdf},
-  hal_id = {hal-03189188},
-  hal_version = {v1},
+  TITLE = {{French vital records data gathering and analysis through image processing and machine learning algorithms}},
+  AUTHOR = {Plateau-Holleville, Cyprien and Bonnot, Enzo and Gechter, Franck and Heyberger, Laurent},
+  URL = {https://hal.archives-ouvertes.fr/hal-03189188},
+  NOTE = {working paper or preprint},
+  YEAR = {2021},
+  KEYWORDS = {Handwritten Text Recognition ; Machine Learning ; Optical Character Recognition ; Historical Data},
+  PDF = {https://hal.archives-ouvertes.fr/hal-03189188v2/file/French_vital_records_data_gathering_and_analysis_through_image_processing_and_machine_learning_algorithms%20%283%29.pdf},
+  HAL_ID = {hal-03189188},
+  HAL_VERSION = {v2},
 }
 ```
 
