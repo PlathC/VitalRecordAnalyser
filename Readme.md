@@ -22,8 +22,6 @@ If you find this code useful and use it for your own production, please cite the
 }
 ```
 
-*This project is a proof of concept that should not be used as it is for production purposes, since it can be highly unstable.*
-
 ## Features
 
 ### DatasetBuilder
